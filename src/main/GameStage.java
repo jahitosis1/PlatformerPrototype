@@ -1,13 +1,9 @@
 package main;
 
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -23,19 +19,21 @@ public class GameStage {
   private Pane uiRoot;
   private Scene scene;
   private Stage stage;
+  private GameTimer gameTimer;
 
   public GameStage() {
     this.root = new Group();
     this.gameRoot = new Pane();
     this.uiRoot = new Pane();
-    this.scene = new Scene(root, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT, Color.CADETBLUE);
+    this.scene = new Scene(root, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT, Color.BLACK);
+    this.gameTimer = new GameTimer(gameRoot, scene);
   }
 
   public void setStage(Stage stage) {
     this.stage = stage;
 
     // set stage elements here
-    // this.root.getChildren().add(gameRoot);
+    this.root.getChildren().add(gameRoot);
 
     // set window
     this.stage.setTitle("Platformer Prototype");
@@ -45,6 +43,7 @@ public class GameStage {
     this.stage.setFullScreen(true);
     this.stage.setResizable(false);
 
+    this.gameTimer.start();
     this.stage.show();
   }
 }
