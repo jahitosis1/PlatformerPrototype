@@ -22,7 +22,8 @@ public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage){
-
+    GameStage theStage = new GameStage();
+    theStage.setStage(primaryStage);
   }
 
   public static void main(String[] args) {
