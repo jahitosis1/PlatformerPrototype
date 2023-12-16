@@ -1,4 +1,4 @@
-package entity;
+package entities;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
