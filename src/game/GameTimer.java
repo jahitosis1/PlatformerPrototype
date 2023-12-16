@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import entity.Player;
+import entities.Player;
 import javafx.animation.AnimationTimer;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
@@ -77,7 +77,7 @@ public class GameTimer extends AnimationTimer {
 
     private void initContent(Pane gameRoot) {
         gameRoot.setPrefSize(1920 * 20, 1080);
-        Image bg = new Image("images/colored_land.png");
+        Image bg = new Image("images/City3.png");
         // create Background
         BackgroundImage backgroundimage = new BackgroundImage(bg,
                 BackgroundRepeat.REPEAT,
@@ -96,12 +96,12 @@ public class GameTimer extends AnimationTimer {
                     case '0':
                         break;
                     case '1':
-                        tile = new ImagePattern(new Image("images/grassMid.png"));
+                        tile = new ImagePattern(new Image("images/Crate.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '2':
-                        tile = new ImagePattern(new Image("images/grassCenter.png"));
+                        tile = new ImagePattern(new Image("images/StreetTile1.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
