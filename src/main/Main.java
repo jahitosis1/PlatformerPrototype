@@ -1,10 +1,10 @@
 package main;
 
+import game.Credits;
 import game.GameStage;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -17,12 +17,14 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage){
     StackPane layout = new StackPane();
+    layout.setPrefSize(1920, 1080);
     VBox buttons = new VBox();
     layout.setAlignment(Pos.CENTER);
     buttons.setAlignment(Pos.CENTER);
     buttons.setSpacing(20);
 
-    Scene scene = new Scene(layout, 300 , 300);
+    Scene scene = new Scene(layout, 1920 , 1080);
+    Credits credits = new Credits(layout);
 
     Image bg = new Image("images/colored_land.png");
     ImageView image2 = new ImageView("images/play button.png");
@@ -35,8 +37,8 @@ public class Main extends Application {
     button2.setStyle("-fx-background-color: transparent;");
     button3.setStyle("-fx-background-color: transparent;");
     button.setOnAction(e -> startGame(primaryStage));
-    button2.setOnAction(e -> Platform.exit());
-    button2.setOnAction(e -> Platform.exit());
+    button2.setOnAction(e -> credits.openCredits(layout));
+    button3.setOnAction(e -> Platform.exit());
 
     BackgroundImage backgroundimage = new BackgroundImage(bg,
             BackgroundRepeat.REPEAT,
@@ -50,6 +52,8 @@ public class Main extends Application {
     buttons.getChildren().addAll(button, button2, button3);
     layout.getChildren().addAll(buttons);
 
+    primaryStage.setFullScreen(true);
+    primaryStage.setResizable(false);
     primaryStage.setScene(scene);
     primaryStage.show();
   }

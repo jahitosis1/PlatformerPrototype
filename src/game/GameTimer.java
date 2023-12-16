@@ -1,58 +1,58 @@
 package game;
 
-import java.io.PrintStream;
-import java.net.StandardSocketOptions;
-import java.util.AbstractCollection;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import entities.Player;
-import javafx.animation.AnimationTimer;
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
+import entity.Player;
+import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
 public class GameTimer extends AnimationTimer {
 
-    private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
-    private ArrayList<Node> platforms = new ArrayList<Node>();
-    private ArrayList<Node> walls = new ArrayList<Node>();
-    private ArrayList<Node> traps = new ArrayList<Node>();
+    private final HashMap<KeyCode, Boolean> keys = new HashMap<>();
+    private final ArrayList<Node> platforms = new ArrayList<>();
+    private final ArrayList<Node> walls = new ArrayList<>();
+    private final ArrayList<Node> traps = new ArrayList<>();
 
     private Player player;
     private int player_hp;
     private int player_coins;
     private Point2D playerVelocity = new Point2D(0, 0);
     private boolean canJump = true;
-    private ImagePattern tile;
-    private Node platform;
 
     private int levelWidth;
     private int levelHeight;
     private Label healthPoints;
-    private Label timer;
+    private Label time;
+    private double gameTimer;
     private Label coins;
+    private Pane pauseUI;
+    private boolean isPaused = false;
+    private boolean invulnerable = false;
+
+    Rectangle matte;
 
     public GameTimer(Pane gameRoot, Pane uiRoot, Scene gameScene) {
-        initContent(gameRoot);
+        initContent(gameRoot, LevelData.LEVEL2);
         initUI(uiRoot);
+        initPauseUI(uiRoot);
 
         gameScene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         gameScene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
@@ -65,19 +65,24 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void update() {
-        if (isPressed(KeyCode.W) && player.getTranslateY() >= 5) jumpPlayer();
-        if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.3);
-        if (isPressed(KeyCode.A) && player.getTranslateX() >= 5) movePlayerX(-3);
-        if (isPressed(KeyCode.D) && player.getTranslateX() + 40 <= levelWidth - 5) movePlayerX(3);
-        movePlayerY((int) playerVelocity.getY());
-        if (!isPressed(KeyCode.W) && !isPressed(KeyCode.A) && !isPressed(KeyCode.S) && !isPressed(KeyCode.D))
-            player.stopMoveAnimation();
-        updateUI();
+        if (!isPaused) {
+            if (isPressed(KeyCode.W) && player.getTranslateY() >= 5) jumpPlayer();
+            if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.3);
+            if (isPressed(KeyCode.A) && player.getTranslateX() >= 5) movePlayerX(-2);
+            if (isPressed(KeyCode.D) && player.getTranslateX() + 40 <= levelWidth - 5) movePlayerX(2);
+            movePlayerY((int) playerVelocity.getY());
+            if (!isPressed(KeyCode.W) && !isPressed(KeyCode.A) && !isPressed(KeyCode.S) && !isPressed(KeyCode.D))
+                player.stopMoveAnimation();
+            updateUI();
+            if (player_hp <= 0) Platform.exit();
+        }
     }
 
-    private void initContent(Pane gameRoot) {
+    private void initContent(Pane gameRoot, String[] levelData) {
         gameRoot.setPrefSize(1920 * 20, 1080);
-        Image bg = new Image("images/City3.png");
+        Image bg = new Image("images/colored_land.png");
+        ImagePattern tile;
+        Node platform;
         // create Background
         BackgroundImage backgroundimage = new BackgroundImage(bg,
                 BackgroundRepeat.REPEAT,
@@ -85,23 +90,23 @@ public class GameTimer extends AnimationTimer {
                 BackgroundPosition.DEFAULT,
                 new BackgroundSize(2000, 1080.0, false, false, false, false));
         Background background = new Background(backgroundimage);
-        levelWidth = LevelData.LEVEL2[0].length() * 60;
-//        levelHeight = LevelData.LEVEL2.length * 60;
+        levelWidth = levelData[0].length() * 60;
+//        levelHeight = levelData.length * 60;
         gameRoot.setBackground(background);
 
-        for (int i = 0; i < LevelData.LEVEL2.length; i++) {
-            String line = LevelData.LEVEL2[i];
+        for (int i = 0; i < levelData.length; i++) {
+            String line = levelData[i];
             for (int j = 0; j < line.length(); j++) {
                 switch (line.charAt(j)) {
                     case '0':
                         break;
                     case '1':
-                        tile = new ImagePattern(new Image("images/Crate.png"));
+                        tile = new ImagePattern(new Image("images/grassMid.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '2':
-                        tile = new ImagePattern(new Image("images/StreetTile1.png"));
+                        tile = new ImagePattern(new Image("images/grassCenter.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
@@ -135,12 +140,13 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void initUI(Pane uiRoot) {
+        uiRoot.setPrefSize(1920, 1080);
         Button pause = new Button("pause");
         pause.setLayoutX(1800);
         pause.setLayoutY(50);
 
         healthPoints = new Label();
-        timer = new Label();
+        time = new Label();
         coins = new Label();
 
         healthPoints.setLayoutX(50);
@@ -151,23 +157,75 @@ public class GameTimer extends AnimationTimer {
         coins.setLayoutY(75);
         coins.setText("Coins: " + player_coins);
 
-        timer.setLayoutX(1920 / 2);
-        timer.setLayoutY(50);
-        timer.setText("Time: " + player_coins);
+        time.setLayoutX((double) 1920 / 2);
+        time.setLayoutY(50);
+        time.setText("Time: " + player_coins);
 
-        pause.setOnMouseClicked(e -> pauseGame());
+        pause.setOnMouseClicked(e -> pauseGame(uiRoot));
 
-        uiRoot.getChildren().addAll(pause, healthPoints, timer, coins);
+        uiRoot.getChildren().addAll(pause, healthPoints, time, coins);
+        startGameTimer();
+    }
+
+    private void initPauseUI(Pane uiRoot){
+
+        pauseUI = new Pane();
+        pauseUI.setPrefSize(500, 400);
+        pauseUI.setLayoutX(710);
+        pauseUI.setLayoutY(340);
+
+        VBox layout = new VBox();
+        layout.setAlignment(Pos.CENTER);
+        layout.setPrefSize(500,400);
+        layout.setSpacing(20);
+
+        matte = new Rectangle(1920, 1080, Color.BLACK);
+        matte.setOpacity(0.5);
+
+        Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        Button resume = new Button("resume");
+        Button quit = new Button("quit");
+        resume.setMinSize(100, 50);
+        resume.setMaxSize(100, 50);
+        quit.setMinSize(100, 50);
+        quit.setMaxSize(100, 50);
+        resume.setOnMouseClicked(event -> resumeGame(uiRoot));
+        quit.setOnMouseClicked(event -> Platform.exit());
+
+        layout.getChildren().addAll(resume, quit);
+        pauseUI.getChildren().addAll(bg, layout);
+
     }
 
     private void updateUI(){
         healthPoints.setText("HP: " + player_hp);
         coins.setText("Coins: " + player_coins);
-        timer.setText("Time: " + player_coins);
+        time.setText("Time: " + gameTimer);
     }
 
-    private void pauseGame() {
-        System.out.println("Game is paused!");
+    private void pauseGame(Pane uiRoot) {
+        uiRoot.getChildren().addAll(matte, pauseUI);
+        isPaused = true;
+    }
+
+    private void resumeGame(Pane uiRoot) {
+        uiRoot.getChildren().removeAll(pauseUI, matte);
+        isPaused = false;
+    }
+
+    private void startGameTimer(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            int count = 0;
+            @Override
+            public void run() {
+                if (!isPaused) {
+                    count++;
+                    gameTimer = (double) count/100;
+//                    Platform.runLater(() -> gameTimer = count);
+                }
+            }
+        }, 0, 10); // Start the timer immediately and update every 1000 milliseconds (1 second)
     }
 
     private void rotatePlayer() {
@@ -190,6 +248,24 @@ public class GameTimer extends AnimationTimer {
                         if (player.getTranslateX() + 40 == platform.getTranslateX()) return;
                     } else {
                         if (player.getTranslateX() == platform.getTranslateX() + 60) return;
+                    }
+                }
+            }
+            for (Node trap : traps) {
+                Bounds trapBounds = trap.getBoundsInParent();
+                double trapHalfHeight = trapBounds.getHeight() / 2;
+
+                Bounds bottomTrapBounds = new BoundingBox(
+                        trapBounds.getMinX(),
+                        trapBounds.getMinY() + trapHalfHeight,
+                        trapBounds.getWidth(),
+                        trapHalfHeight
+                );
+
+                if (player.getBoundsInParent().intersects(bottomTrapBounds)) {
+                    if (!invulnerable) {
+                        damagePlayer();
+                        invulnerabilityTimer();
                     }
                 }
             }
@@ -217,16 +293,56 @@ public class GameTimer extends AnimationTimer {
                     }
                 }
             }
+            for (Node trap : traps) {
+                if (player.getBoundsInParent().intersects(trap.getBoundsInParent())) {
+                    if (!invulnerable) {
+                        damagePlayer();
+                        invulnerabilityTimer();
+                    }
+                }
+            }
             player.setTranslateY(player.getTranslateY() + (movingDown ? 1 : -1));
         }
     }
 
+    private void invulnerabilityTimer(){
+        // Change invulnerable to true
+        invulnerable = true;
+
+        // Create a FadeTransition on the player
+        FadeTransition fade = new FadeTransition(Duration.seconds(3), player);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setDuration(Duration.millis(250));
+        fade.setAutoReverse(true);
+        fade.setCycleCount(Transition.INDEFINITE);
+
+        // Start the FadeTransition
+        fade.play();
+
+        // Create a PauseTransition with a duration of 3 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+
+        // Set a ChangeListener to change invulnerable back to false after the pause
+        pause.setOnFinished(event -> {
+            invulnerable = false;
+            fade.stop();
+        });
+
+        // Start the PauseTransition
+        pause.play();
+    }
+
     private void jumpPlayer() {
         if (canJump) {
-            playerVelocity = playerVelocity.add(0, -25);
+            playerVelocity = playerVelocity.add(0, -23);
             canJump = false;
             player.startJumpAnimation();
         }
+    }
+
+    private void damagePlayer(){
+        player_hp--;
     }
 
     private Node createEntity(int x, int y, int width, int height, ImagePattern fill, Pane gameRoot) {
