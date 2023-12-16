@@ -66,7 +66,7 @@ public class GameTimer extends AnimationTimer {
 
     private void update() {
         if (isPressed(KeyCode.W) && player.getTranslateY() >= 5) jumpPlayer();
-        if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.5);
+        if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.3);
         if (isPressed(KeyCode.A) && player.getTranslateX() >= 5) movePlayerX(-3);
         if (isPressed(KeyCode.D) && player.getTranslateX() + 40 <= levelWidth - 5) movePlayerX(3);
         movePlayerY((int) playerVelocity.getY());
@@ -223,7 +223,7 @@ public class GameTimer extends AnimationTimer {
 
     private void jumpPlayer() {
         if (canJump) {
-            playerVelocity = playerVelocity.add(0, -30);
+            playerVelocity = playerVelocity.add(0, -25);
             canJump = false;
             player.startJumpAnimation();
         }
