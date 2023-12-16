@@ -1,33 +1,66 @@
 package main;
 
-import java.lang.Math;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import javafx.animation.AnimationTimer;
+import game.GameStage;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage){
-    GameStage theStage = new GameStage();
-    theStage.setStage(primaryStage);
+    StackPane layout = new StackPane();
+    VBox buttons = new VBox();
+    layout.setAlignment(Pos.CENTER);
+    buttons.setAlignment(Pos.CENTER);
+    buttons.setSpacing(20);
+
+    Scene scene = new Scene(layout, 300 , 300);
+
+    Image bg = new Image("images/colored_land.png");
+    ImageView image2 = new ImageView("images/play button.png");
+    ImageView image3 = new ImageView("images/options_button.png");
+    ImageView image4 = new ImageView("images/quit_button.png");
+    Button button = new Button("", image2);
+    Button button2 = new Button("", image3);
+    Button button3 = new Button("", image4);
+    button.setStyle("-fx-background-color: transparent;");
+    button2.setStyle("-fx-background-color: transparent;");
+    button3.setStyle("-fx-background-color: transparent;");
+    button.setOnAction(e -> startGame(primaryStage));
+    button2.setOnAction(e -> Platform.exit());
+    button2.setOnAction(e -> Platform.exit());
+
+    BackgroundImage backgroundimage = new BackgroundImage(bg,
+            BackgroundRepeat.REPEAT,
+            BackgroundRepeat.REPEAT,
+            BackgroundPosition.DEFAULT,
+            new BackgroundSize(1920.0, 1080.0, false, false, false, false));
+    Background background = new Background(backgroundimage);
+    layout.setBackground(background);
+
+
+    buttons.getChildren().addAll(button, button2, button3);
+    layout.getChildren().addAll(buttons);
+
+    primaryStage.setScene(scene);
+    primaryStage.show();
   }
 
   public static void main(String[] args) {
     launch();
   }
-
+  
+  public void startGame(Stage primaryStage) {
+    GameStage theStage = new GameStage();
+    theStage.setStage(primaryStage);
+  }
+  
 }

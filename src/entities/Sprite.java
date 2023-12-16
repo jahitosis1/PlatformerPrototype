@@ -1,22 +1,33 @@
-package entities;
+package entity;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.shape.Shape;
+import javafx.util.Duration;
 
-public abstract class Sprite {
+
+public abstract class Sprite extends ImageView {
   protected Image img;
+  public Shape collisionShape;
   protected int x, y, dx, dy;
   protected boolean visible;
   protected double width;
   protected double height;
   protected double collisionX, collisionY;
 
-  public Sprite(int xPos, int yPos){
-    this.x = xPos;
-    this.y = yPos;
-    this.visible = true;
+//  public Sprite(int xPos, int yPos){
+//    this.x = xPos;
+//    this.y = yPos;
+//    this.visible = true;
+//  }
+  public Sprite (Image image) {
+    super(image);
   }
 
   //method to set the object's image
@@ -51,17 +62,17 @@ public abstract class Sprite {
   }
 
   //method to return the image
-  Image getImage(){
-    return this.img;
-  }
+//  Image getImage(){
+//    return this.img;
+//  }
   //getters
-  public int getX() {
-    return this.x;
-  }
-
-  public int getY() {
-    return this.y;
-  }
+//  public int getX() {
+//    return this.x;
+//  }
+//
+//  public int getY() {
+//    return this.y;
+//  }
 
   public int getDX(){
     return this.dx;
@@ -73,10 +84,10 @@ public abstract class Sprite {
   public boolean getVisible(){
     return visible;
   }
-  public boolean isVisible(){
-    if(visible) return true;
-    return false;
-  }
+//  public boolean isVisible(){
+//    if(visible) return true;
+//    return false;
+//  }
 
   //setters
   public void setDX(int dx){
@@ -95,11 +106,23 @@ public abstract class Sprite {
     this.height = val;
   }
 
-  public void setVisible(boolean value){
-    this.visible = value;
-  }
+//  public void setVisible(boolean value){
+//    this.visible = value;
+//  }
   
   // protected abstract void setCollision();
-  
+  protected Timeline createAnimation(int frameCount, String state, int width, int height, int cycleCount, boolean autoReverse) {
+    Timeline newAnim = new Timeline();
+    newAnim.setCycleCount(cycleCount);
+    newAnim.setAutoReverse(autoReverse);
+    for (int i = 0; i < frameCount; i++) {
+      String filename = "images/" + state + i + ".png";
+      Image sprite = new Image(filename, width, height, false, false);
+      newAnim.getKeyFrames().add(
+              new KeyFrame(Duration.millis(100*i), new KeyValue(this.imageProperty(), sprite))
+      );
+    }
+    return newAnim;
+  }
 
 }
