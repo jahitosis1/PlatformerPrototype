@@ -1,4 +1,4 @@
-package com.example.workpls.entity;
+package entity;
 
 import javafx.animation.Animation;
 import javafx.animation.Timeline;
@@ -7,9 +7,9 @@ import javafx.scene.shape.Rectangle;
 
 public class Player extends Sprite {
     private final static int PLAYER_SIZE = 40;
-    public final static Image PLAYER_SPRITE_IDLE = new Image("Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
-    public final static Image PLAYER_SPRITE_MOVE7 = new Image("Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
-    public final static Image PLAYER_SPRITE_JUMP = new Image("Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    public final static Image PLAYER_SPRITE_IDLE = new Image("images/Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    public final static Image PLAYER_SPRITE_MOVE7 = new Image("images/Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    public final static Image PLAYER_SPRITE_JUMP = new Image("images/Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     private final Timeline idleAnimation;
     private final Timeline moveAnimation;
     private final Timeline jumpAnimation;

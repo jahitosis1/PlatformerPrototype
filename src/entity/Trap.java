@@ -1,4 +1,4 @@
-package entities;
+package entity;
 
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;

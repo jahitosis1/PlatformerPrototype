@@ -1,4 +1,4 @@
-package com.example.workpls.game;
+package game;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -25,23 +25,23 @@ public class Credits {
 
        Rectangle bg = new Rectangle(1920, 1080, Color.LIGHTBLUE);
        bg.setOpacity(0.7);
-       Button resume = new Button("", new ImageView("hudX.png"));
+       Button resume = new Button("", new ImageView("images/hudX.png"));
        resume.setStyle("-fx-background-color: transparent;");
        resume.setOnMouseClicked(event -> uiRoot.getChildren().remove(credits));
        resume.setLayoutX(1800);
        resume.setLayoutY(0);
 
-       Image image1 = new Image("ken.jpg");
+       Image image1 = new Image("images/ken.jpg");
        ImageView imageView1 = new ImageView(image1);
        imageView1.setFitWidth(300);
        imageView1.setFitHeight(300);
 
-       Image image2 = new Image("ron.jpg");
+       Image image2 = new Image("images/ron.jpg");
        ImageView imageView2 = new ImageView(image2);
        imageView2.setFitWidth(300);
        imageView2.setFitHeight(300);
 
-       Image image3 = new Image("joshua.jpg");
+       Image image3 = new Image("images/joshua.jpg");
        ImageView imageView3 = new ImageView(image3);
        imageView3.setFitWidth(300);
        imageView3.setFitHeight(300);

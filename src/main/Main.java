@@ -1,7 +1,7 @@
-package com.example.workpls.main;
+package main;
 
-import com.example.workpls.game.Credits;
-import com.example.workpls.game.GameStage;
+import game.Credits;
+import game.GameStage;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -26,10 +26,10 @@ public class Main extends Application {
     Scene scene = new Scene(layout, 1920 , 1080);
     Credits credits = new Credits(layout);
 
-    Image bg = new Image("colored_land.png");
-    ImageView image2 = new ImageView("play button.png");
-    ImageView image3 = new ImageView("options_button.png");
-    ImageView image4 = new ImageView("quit_button.png");
+    Image bg = new Image("images/colored_land.png");
+    ImageView image2 = new ImageView("images/play button.png");
+    ImageView image3 = new ImageView("images/options_button.png");
+    ImageView image4 = new ImageView("images/quit_button.png");
     Button button = new Button("", image2);
     Button button2 = new Button("", image3);
     Button button3 = new Button("", image4);

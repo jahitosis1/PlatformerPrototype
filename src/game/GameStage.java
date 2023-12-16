@@ -1,4 +1,4 @@
-package com.example.workpls.game;
+package game;
 
 import javafx.scene.Group;
 import javafx.scene.Scene;

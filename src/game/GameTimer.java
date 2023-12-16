@@ -1,11 +1,11 @@
-package com.example.workpls.game;
+package game;
 
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.example.workpls.entity.Player;
+import entity.Player;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
@@ -80,7 +80,7 @@ public class GameTimer extends AnimationTimer {
 
     private void initContent(Pane gameRoot, String[] levelData) {
         gameRoot.setPrefSize(1920 * 20, 1080);
-        Image bg = new Image("colored_land.png");
+        Image bg = new Image("images/colored_land.png");
         ImagePattern tile;
         Node platform;
         // create Background
@@ -101,17 +101,17 @@ public class GameTimer extends AnimationTimer {
                     case '0':
                         break;
                     case '1':
-                        tile = new ImagePattern(new Image("grassMid.png"));
+                        tile = new ImagePattern(new Image("images/grassMid.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '2':
-                        tile = new ImagePattern(new Image("grassCenter.png"));
+                        tile = new ImagePattern(new Image("images/grassCenter.png"));
                         platform = createEntity(j * 60, i * 60, 60, 60, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '3':
-                        Node spike = createEntity(j * 60, i * 60, 60, 60, new ImagePattern(new Image("spikes.png")), gameRoot);
+                        Node spike = createEntity(j * 60, i * 60, 60, 60, new ImagePattern(new Image("images/spikes.png")), gameRoot);
                         traps.add(spike);
                         break;
                     default:

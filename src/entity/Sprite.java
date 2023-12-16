@@ -1,4 +1,4 @@
-package com.example.workpls.entity;
+package entity;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -80,7 +80,7 @@ public abstract class Sprite extends ImageView {
     newAnim.setCycleCount(cycleCount);
     newAnim.setAutoReverse(autoReverse);
     for (int i = 0; i < frameCount; i++) {
-      String filename = state + i + ".png";
+      String filename = "images/" + state + i + ".png";
       Image sprite = new Image(filename, width, height, false, false);
       newAnim.getKeyFrames().add(
               new KeyFrame(Duration.millis(100*i), new KeyValue(this.imageProperty(), sprite))
