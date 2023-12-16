@@ -1,4 +1,4 @@
-package entities;
+package com.example.workpls.entity;
 
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
