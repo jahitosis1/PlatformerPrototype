@@ -13,7 +13,6 @@ import javafx.util.Duration;
 
 public abstract class Sprite extends ImageView {
   protected Image img;
-  public Shape collisionShape;
   protected int x, y, dx, dy;
   protected boolean visible;
   protected double width;

@@ -18,7 +18,6 @@ public class Enemy extends Sprite {
 
     public Enemy(int x_pos, int y_pos) {
         super(Enemy.ENEMY_SPRITE_IDLE);
-        this.collisionShape = new Rectangle(ENEMY_SIZE, ENEMY_SIZE);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 

@@ -12,7 +12,6 @@ public class Trap extends Sprite {
 
     public Trap(int x_pos, int y_pos) {
         super(Trap.TRAP_POPUP);
-        this.collisionShape = new Rectangle(TRAP_SIZE, TRAP_SIZE);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 

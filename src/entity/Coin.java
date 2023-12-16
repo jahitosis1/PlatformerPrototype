@@ -12,7 +12,6 @@ public class Coin extends Sprite {
 
     public Coin(int x_pos, int y_pos) {
         super(Coin.COIN_SPRITE);
-        this.collisionShape = new Rectangle(COIN_SIZE, COIN_SIZE);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 
