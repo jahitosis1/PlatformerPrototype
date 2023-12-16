@@ -11,7 +11,6 @@ public class NPC extends Sprite {
 
     public NPC(int x_pos, int y_pos) {
         super(NPC.NPC_SPRITE);
-        this.collisionShape = new Rectangle(NPC_SIZE, NPC_SIZE);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 
@@ -19,6 +18,5 @@ public class NPC extends Sprite {
 
         // Start the animation
         idleAnimation.play();
-//        idleAnimation.play();
     }
 }

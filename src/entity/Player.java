@@ -18,7 +18,6 @@ public class Player extends Sprite {
 
     public Player(int x_pos, int y_pos) {
         super(Player.PLAYER_SPRITE_IDLE);
-        this.collisionShape = new Rectangle(PLAYER_SIZE, PLAYER_SIZE);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 

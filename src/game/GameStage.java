@@ -3,7 +3,6 @@ package game;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class GameStage {
@@ -14,33 +13,31 @@ public class GameStage {
   private final Pane gameRoot;
   private final Pane uiRoot;
   private final Scene scene;
-  private Stage stage;
-  private GameTimer gameTimer;
+  private final GameTimer gameTimer;
 
-  public GameStage() {
+  public GameStage(Stage primaryStage, Scene previousScene) {
     this.root = new Group();
     this.gameRoot = new Pane();
     this.uiRoot = new Pane();
     this.scene = new Scene(root, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
-    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene);
+    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene, primaryStage, previousScene);
   }
 
   public void setStage(Stage stage) {
-    this.stage = stage;
 
     // set stage elements here
     this.root.getChildren().addAll(gameRoot, uiRoot);
 
     // set window
-    this.stage.setTitle("Platformer Prototype");
-    this.stage.setScene(this.scene);
-    this.stage.setMinWidth(WINDOW_WIDTH);
-    this.stage.setMinHeight(WINDOW_HEIGHT);
+    stage.setTitle("Platformer Prototype");
+    stage.setScene(this.scene);
+    stage.setMinWidth(WINDOW_WIDTH);
+    stage.setMinHeight(WINDOW_HEIGHT);
 
-    this.stage.setFullScreen(true);
-    this.stage.setResizable(false);
+    stage.setFullScreen(true);
+    stage.setResizable(false);
 
     this.gameTimer.start();
-    this.stage.show();
+    stage.show();
   }
 }

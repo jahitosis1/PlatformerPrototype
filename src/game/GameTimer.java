@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import entity.Coin;
+import entity.NPC;
 import entity.Player;
 import javafx.animation.*;
 import javafx.application.Platform;
@@ -22,6 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class GameTimer extends AnimationTimer {
@@ -30,6 +33,8 @@ public class GameTimer extends AnimationTimer {
     private final ArrayList<Node> platforms = new ArrayList<>();
     private final ArrayList<Node> walls = new ArrayList<>();
     private final ArrayList<Node> traps = new ArrayList<>();
+    private final ArrayList<Node> npcs = new ArrayList<>();
+    private final ArrayList<Node> coins = new ArrayList<>();
 
     private Player player;
     private int player_hp;
@@ -42,14 +47,20 @@ public class GameTimer extends AnimationTimer {
     private Label healthPoints;
     private Label time;
     private double gameTimer;
-    private Label coins;
+    private Label coin_count;
     private Pane pauseUI;
     private boolean isPaused = false;
     private boolean invulnerable = false;
+    private final Scene mainMenu;
+    private final Stage primaryStage;
+    private final Pane gameRoot;
 
     Rectangle matte;
 
-    public GameTimer(Pane gameRoot, Pane uiRoot, Scene gameScene) {
+    public GameTimer(Pane gameRoot, Pane uiRoot, Scene gameScene, Stage primaryStage, Scene previousScene) {
+        this.mainMenu = previousScene;
+        this.primaryStage = primaryStage;
+        this.gameRoot = gameRoot;
         initContent(gameRoot, LevelData.LEVEL2);
         initUI(uiRoot);
         initPauseUI(uiRoot);
@@ -75,6 +86,7 @@ public class GameTimer extends AnimationTimer {
                 player.stopMoveAnimation();
             updateUI();
             if (player_hp <= 0) Platform.exit();
+            collideCoin();
         }
     }
 
@@ -114,6 +126,18 @@ public class GameTimer extends AnimationTimer {
                         Node spike = createEntity(j * 60, i * 60, 60, 60, new ImagePattern(new Image("images/spikes.png")), gameRoot);
                         traps.add(spike);
                         break;
+                    case '4':
+                        Node wall = createEntity(j * 60, i * 60, 60, 60, new ImagePattern(new Image("images/grassCenter.png")), gameRoot);
+                        walls.add(wall);
+                        break;
+                    case '5':
+                        NPC npc = createNPC(j*60, i*60,gameRoot);
+                        npcs.add(npc);
+                        break;
+                    case '6':
+                        Coin coin = createCoin(j*60, i*60,gameRoot);
+                        coins.add(coin);
+                        break;
                     default:
                         break;
                 }
@@ -147,15 +171,15 @@ public class GameTimer extends AnimationTimer {
 
         healthPoints = new Label();
         time = new Label();
-        coins = new Label();
+        coin_count = new Label();
 
         healthPoints.setLayoutX(50);
         healthPoints.setLayoutY(50);
         healthPoints.setText("HP: " + player_hp);
 
-        coins.setLayoutX(50);
-        coins.setLayoutY(75);
-        coins.setText("Coins: " + player_coins);
+        coin_count.setLayoutX(50);
+        coin_count.setLayoutY(75);
+        coin_count.setText("Coins: " + player_coins);
 
         time.setLayoutX((double) 1920 / 2);
         time.setLayoutY(50);
@@ -163,7 +187,7 @@ public class GameTimer extends AnimationTimer {
 
         pause.setOnMouseClicked(e -> pauseGame(uiRoot));
 
-        uiRoot.getChildren().addAll(pause, healthPoints, time, coins);
+        uiRoot.getChildren().addAll(pause, healthPoints, time, coin_count);
         startGameTimer();
     }
 
@@ -184,22 +208,32 @@ public class GameTimer extends AnimationTimer {
 
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
         Button resume = new Button("resume");
+        Button menu = new Button("main menu");
         Button quit = new Button("quit");
         resume.setMinSize(100, 50);
         resume.setMaxSize(100, 50);
+        menu.setMinSize(100, 50);
+        menu.setMaxSize(100, 50);
         quit.setMinSize(100, 50);
         quit.setMaxSize(100, 50);
         resume.setOnMouseClicked(event -> resumeGame(uiRoot));
+        menu.setOnMouseClicked(event -> {
+            this.stop();
+            primaryStage.setScene(mainMenu);
+            primaryStage.setFullScreen(true);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+        });
         quit.setOnMouseClicked(event -> Platform.exit());
 
-        layout.getChildren().addAll(resume, quit);
+        layout.getChildren().addAll(resume, menu, quit);
         pauseUI.getChildren().addAll(bg, layout);
 
     }
 
     private void updateUI(){
         healthPoints.setText("HP: " + player_hp);
-        coins.setText("Coins: " + player_coins);
+        coin_count.setText("Coins: " + player_coins);
         time.setText("Time: " + gameTimer);
     }
 
@@ -269,6 +303,11 @@ public class GameTimer extends AnimationTimer {
                     }
                 }
             }
+            for (Node wall : walls) {
+                if (player.getTranslateX() + 40 == wall.getTranslateX()) {
+                    player.setTranslateX(player.getTranslateX() - 1);
+                }
+            }
             player.setScaleX((double) value / Math.abs(value));
             player.setTranslateX(player.getTranslateX() + (movingRight ? 1 : -1));
             player.startMoveAnimation();
@@ -277,6 +316,8 @@ public class GameTimer extends AnimationTimer {
 
     private void movePlayerY(int value) {
         boolean movingDown = value > 0;
+        double fallSpeed = 1.0;
+
 
         for (int i = 0; i < Math.abs(value); i++) {
             for (Node platform : platforms) {
@@ -301,7 +342,13 @@ public class GameTimer extends AnimationTimer {
                     }
                 }
             }
-            player.setTranslateY(player.getTranslateY() + (movingDown ? 1 : -1));
+//            for (Node wall : walls) {
+//                if (player.getBoundsInParent().intersects(wall.getBoundsInParent())) {
+//                    fallSpeed *= 0.5; // Decrease the speed of fall by 50%
+//                    canJump = true;
+//                }
+//            }
+            player.setTranslateY(player.getTranslateY() + (movingDown ? fallSpeed*0.5 : -fallSpeed));
         }
     }
 
@@ -345,6 +392,15 @@ public class GameTimer extends AnimationTimer {
         player_hp--;
     }
 
+    private void collideCoin() {
+        for (Node coin : coins) {
+            if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
+                player_coins++;
+                gameRoot.getChildren().remove(coin);
+            }
+        }
+    }
+
     private Node createEntity(int x, int y, int width, int height, ImagePattern fill, Pane gameRoot) {
         Rectangle entity = new Rectangle(width, height);
         entity.setTranslateX(x);
@@ -357,6 +413,18 @@ public class GameTimer extends AnimationTimer {
 
     private Player createPlayer(int x, int y, Pane gameRoot) {
         Player entity = new Player(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+    private NPC createNPC(int x, int y, Pane gameRoot) {
+        NPC entity = new NPC(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+    private Coin createCoin(int x, int y, Pane gameRoot) {
+        Coin entity = new Coin(x, y);
 
         gameRoot.getChildren().add(entity);
         return entity;
