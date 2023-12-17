@@ -5,15 +5,15 @@ import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 
 public class Player extends Sprite {
-    private final static int PLAYER_SIZE = 40;
+    private final static int PLAYER_SIZE = 80;
     public final static Image PLAYER_SPRITE_IDLE = new Image("images/Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     public final static Image PLAYER_SPRITE_MOVE7 = new Image("images/Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     public final static Image PLAYER_SPRITE_JUMP = new Image("images/Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
-    public boolean isJumping = false;
+    public boolean isJumping = true;
 
 
     public Player(int x_pos, int y_pos) {
-        super(Player.PLAYER_SPRITE_IDLE);
+        super(Player.PLAYER_SPRITE_JUMP);
         this.setTranslateX(x_pos);
         this.setTranslateY(y_pos);
 
@@ -22,7 +22,7 @@ public class Player extends Sprite {
         jumpAnimation = createAnimation(2,"Character1M_1_jump_", PLAYER_SIZE, PLAYER_SIZE, Timeline.INDEFINITE, false);
 
         // Start the animation
-        idleAnimation.play();
+        jumpAnimation.play();
 //        idleAnimation.play();
     }
 
@@ -39,7 +39,9 @@ public class Player extends Sprite {
     public void stopMoveAnimation() {
         if (isJumping) return;
         moveAnimation.stop();
-        this.setImage(PLAYER_SPRITE_IDLE);
+        if (idleAnimation.getStatus() == Animation.Status.STOPPED) {
+            this.setImage(PLAYER_SPRITE_IDLE);
+        }
         idleAnimation.play();
     }
     public void startJumpAnimation() {
