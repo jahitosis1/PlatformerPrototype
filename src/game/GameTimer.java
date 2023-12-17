@@ -586,7 +586,6 @@ public class GameTimer extends AnimationTimer {
         if (npcs.isEmpty()) return;
         for (Node npc : npcs) {
             if (player.getBoundsInParent().intersects(npc.getBoundsInParent())) {
-                System.out.println(jumpPower);
                 jumpPower = 35;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
@@ -598,7 +597,6 @@ public class GameTimer extends AnimationTimer {
                             count++;
                             if (count > 3) {
                                 jumpPower = 25;
-                                System.out.println(jumpPower);
                                 this.cancel();
                             }
                         }
