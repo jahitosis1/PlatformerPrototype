@@ -38,6 +38,5 @@ public class GameStage {
     stage.setResizable(false);
 
     this.gameTimer.start();
-    stage.show();
   }
 }

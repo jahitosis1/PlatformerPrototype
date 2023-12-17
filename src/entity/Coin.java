@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.shape.Rectangle;
 
 public class Coin extends Sprite {
-    private final static int COIN_SIZE = 60;
+    private final static int COIN_SIZE = 120;
     public final static Image COIN_SPRITE = new Image("images/Coin_0.png", COIN_SIZE, COIN_SIZE, false, false);
     private final Timeline idleAnimation;
 
