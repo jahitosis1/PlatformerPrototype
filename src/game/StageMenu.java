@@ -29,8 +29,8 @@ public class StageMenu {
 
         Scene scene = new Scene(layout, 1920 , 1080);
 
-        Image bg = new Image("images/colored_land.png");
-        ImageView image2 = new ImageView("images/play button.png");
+        Image bg = new Image("images/tempbg.png");
+        ImageView image2 = new ImageView("images/play_button.png");
         ImageView image3 = new ImageView("images/options_button.png");
         ImageView image4 = new ImageView("images/quit_button.png");
 
@@ -83,7 +83,7 @@ public class StageMenu {
         layout.getChildren().addAll(buttons);
 
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
         primaryStage.setResizable(false);
 
     }
