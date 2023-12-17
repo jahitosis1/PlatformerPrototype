@@ -12,66 +12,12 @@ import javafx.util.Duration;
 
 
 public abstract class Sprite extends ImageView {
-  protected Image img;
-  protected int x, y, dx, dy;
-  protected boolean visible;
-  protected double width;
-  protected double height;
+  protected Timeline idleAnimation;
+  protected Timeline moveAnimation;
+  protected Timeline jumpAnimation;
 
   public Sprite (Image image) {
     super(image);
-  }
-
-  //method to set the object's image
-  protected void loadImage(Image img){
-    try{
-      this.img = img;
-      this.setSize();
-    } catch(Exception e){}
-  }
-
-  //method to set the image to the image view node
-  public void render(GraphicsContext gc){
-    gc.drawImage(this.img, this.x, this.y);
-
-  }
-
-  //method to set the object's width and height properties
-  private void setSize(){
-    this.width = this.img.getWidth();
-    this.height = this.img.getHeight();
-  }
-
-  private Rectangle2D getBounds(){
-    return new Rectangle2D(this.x, this.y, this.width, this.height);
-  }
-
-  public int getDX(){
-    return this.dx;
-  }
-  public int getDY(){
-    return this.dy;
-  }
-
-  public boolean getVisible(){
-    return visible;
-  }
-
-  //setters
-  public void setDX(int dx){
-    this.dx = dx;
-  }
-
-  public void setDY(int dy){
-    this.dy = dy;
-  }
-
-  public void setWidth(double val){
-    this.width = val;
-  }
-
-  public void setHeight(double val){
-    this.height = val;
   }
 
   protected Timeline createAnimation(int frameCount, String state, int width, int height, int cycleCount, boolean autoReverse) {

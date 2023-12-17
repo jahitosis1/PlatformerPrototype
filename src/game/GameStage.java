@@ -15,12 +15,12 @@ public class GameStage {
   private final Scene scene;
   private final GameTimer gameTimer;
 
-  public GameStage(Stage primaryStage, Scene previousScene) {
+  public GameStage(Stage primaryStage, Scene previousScene, String[] levelData) {
     this.root = new Group();
     this.gameRoot = new Pane();
     this.uiRoot = new Pane();
     this.scene = new Scene(root, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
-    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene, primaryStage, previousScene);
+    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene, primaryStage, previousScene, levelData);
   }
 
   public void setStage(Stage stage) {

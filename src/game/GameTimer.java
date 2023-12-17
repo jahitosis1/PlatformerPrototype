@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import entity.Coin;
-import entity.NPC;
-import entity.Player;
+import entity.*;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
@@ -35,35 +33,45 @@ public class GameTimer extends AnimationTimer {
     private final ArrayList<Node> traps = new ArrayList<>();
     private final ArrayList<Node> npcs = new ArrayList<>();
     private final ArrayList<Node> coins = new ArrayList<>();
-
-    private Player player;
+    private final ArrayList<Enemy> enemies = new ArrayList<>();
+    private final String[] levelData;
     private int player_hp;
     private int player_coins;
-    private Point2D playerVelocity = new Point2D(0, 0);
-    private boolean canJump = true;
-
     private int levelWidth;
     private int levelHeight;
+    private double gameTimer;
+    private double fallSpeed = 1.0;
+    private Player player;
+    private Point2D playerVelocity = new Point2D(0, 0);
     private Label healthPoints;
     private Label time;
-    private double gameTimer;
     private Label coin_count;
     private Pane pauseUI;
+    private Pane gameOverUI;
+    private Pane stageClearUI;
+    private boolean canJump = true;
     private boolean isPaused = false;
     private boolean invulnerable = false;
     private final Scene mainMenu;
     private final Stage primaryStage;
     private final Pane gameRoot;
+    private final Pane uiRoot;
 
     Rectangle matte;
 
-    public GameTimer(Pane gameRoot, Pane uiRoot, Scene gameScene, Stage primaryStage, Scene previousScene) {
+    public GameTimer(Pane gameRoot, Pane uiRoot, Scene gameScene, Stage primaryStage, Scene previousScene, String[] levelData) {
         this.mainMenu = previousScene;
         this.primaryStage = primaryStage;
         this.gameRoot = gameRoot;
-        initContent(gameRoot, LevelData.LEVEL2);
+        this.uiRoot = uiRoot;
+        this.levelData = levelData;
+        clearAll();
+        initContent(gameRoot, levelData);
         initUI(uiRoot);
         initPauseUI(uiRoot);
+        initClearUI(uiRoot);
+        initGameOverUI(uiRoot);
+        isPaused = false;
 
         gameScene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         gameScene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
@@ -84,10 +92,24 @@ public class GameTimer extends AnimationTimer {
             movePlayerY((int) playerVelocity.getY());
             if (!isPressed(KeyCode.W) && !isPressed(KeyCode.A) && !isPressed(KeyCode.S) && !isPressed(KeyCode.D))
                 player.stopMoveAnimation();
-            updateUI();
-            if (player_hp <= 0) Platform.exit();
+            moveEnemy();
             collideCoin();
+            collideEnemy();
+            updateUI();
+            if (player_hp <= 0) gameOver(uiRoot);
+            if (isCleared()) stageClear(uiRoot);
         }
+    }
+
+    public void clearAll(){
+        platforms.clear();
+        walls.clear();
+        traps.clear();
+        npcs.clear();
+        coins.clear();
+        enemies.clear();
+        player_coins = 0;
+        player_hp = 10;
     }
 
     private void initContent(Pane gameRoot, String[] levelData) {
@@ -138,6 +160,10 @@ public class GameTimer extends AnimationTimer {
                         Coin coin = createCoin(j*60, i*60,gameRoot);
                         coins.add(coin);
                         break;
+                    case '7':
+                        BasicEnemy enemy = createEnemy(j*60, i*60,gameRoot);
+                        enemies.add(enemy);
+                        break;
                     default:
                         break;
                 }
@@ -147,7 +173,9 @@ public class GameTimer extends AnimationTimer {
         player = createPlayer(60, 900, gameRoot);
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
-            if (offset > 640 && offset < levelWidth - 640) gameRoot.setLayoutX(-(offset - 640));
+            if (offset > GameStage.WINDOW_WIDTH / 2 && offset < levelWidth - GameStage.WINDOW_WIDTH / 2) {
+                gameRoot.setLayoutX(-(offset - -40 - (double) GameStage.WINDOW_WIDTH / 2));
+            }
         });
 //        player.translateYProperty().addListener((obs, old, newValue) -> {
 //            int offset = newValue.intValue();
@@ -217,17 +245,103 @@ public class GameTimer extends AnimationTimer {
         quit.setMinSize(100, 50);
         quit.setMaxSize(100, 50);
         resume.setOnMouseClicked(event -> resumeGame(uiRoot));
-        menu.setOnMouseClicked(event -> {
-            this.stop();
-            primaryStage.setScene(mainMenu);
-            primaryStage.setFullScreen(true);
-            primaryStage.setResizable(false);
-            primaryStage.show();
-        });
+        menu.setOnMouseClicked(event -> backToMenu());
         quit.setOnMouseClicked(event -> Platform.exit());
 
         layout.getChildren().addAll(resume, menu, quit);
         pauseUI.getChildren().addAll(bg, layout);
+
+    }
+    private void initClearUI(Pane uiRoot){
+
+        stageClearUI = new Pane();
+        stageClearUI.setPrefSize(500, 400);
+        stageClearUI.setLayoutX(710);
+        stageClearUI.setLayoutY(340);
+
+        HBox layout = new HBox();
+        layout.setAlignment(Pos.CENTER);
+        layout.setPrefSize(500,400);
+        layout.setSpacing(20);
+        
+        VBox layout2 = new VBox();
+        layout2.setAlignment(Pos.CENTER);
+        layout2.setPrefSize(500,400);
+        layout2.setSpacing(20);
+
+        HBox layout3 = new HBox();
+        layout3.setAlignment(Pos.CENTER);
+        layout3.setPrefSize(500,400);
+        layout3.setSpacing(20);
+
+        matte = new Rectangle(1920, 1080, Color.BLACK);
+        matte.setOpacity(0.5);
+
+        Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        Button next_level = new Button("next level");
+        Button menu = new Button("main menu");
+        Button quit = new Button("quit");
+        next_level.setMinSize(100, 50);
+        next_level.setMaxSize(100, 50);
+        menu.setMinSize(100, 50);
+        menu.setMaxSize(100, 50);
+        quit.setMinSize(100, 50);
+        quit.setMaxSize(100, 50);
+        next_level.setOnMouseClicked(event -> nextLevel());
+        menu.setOnMouseClicked(event -> backToMenu());
+        quit.setOnMouseClicked(event -> Platform.exit());
+
+        Label cleared = new Label();
+        cleared.setText("Stage CLear!");
+
+        layout3.getChildren().addAll(cleared);
+        layout.getChildren().addAll(next_level, menu, quit);
+        layout2.getChildren().addAll(layout3, layout);
+        stageClearUI.getChildren().addAll(bg, layout2);
+
+    }
+    private void initGameOverUI(Pane uiRoot){
+
+        gameOverUI = new Pane();
+        gameOverUI.setPrefSize(500, 400);
+        gameOverUI.setLayoutX(710);
+        gameOverUI.setLayoutY(340);
+
+        HBox layout = new HBox();
+        layout.setAlignment(Pos.CENTER);
+        layout.setPrefSize(500,400);
+        layout.setSpacing(20);
+
+        VBox layout2 = new VBox();
+        layout2.setAlignment(Pos.CENTER);
+        layout2.setPrefSize(500,400);
+        layout2.setSpacing(20);
+
+        HBox layout3 = new HBox();
+        layout3.setAlignment(Pos.CENTER);
+        layout3.setPrefSize(500,400);
+        layout3.setSpacing(20);
+
+        matte = new Rectangle(1920, 1080, Color.BLACK);
+        matte.setOpacity(0.5);
+
+        Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        Button menu = new Button("main menu");
+        Button quit = new Button("quit");
+        menu.setMinSize(100, 50);
+        menu.setMaxSize(100, 50);
+        quit.setMinSize(100, 50);
+        quit.setMaxSize(100, 50);
+        menu.setOnMouseClicked(event -> backToMenu());
+        quit.setOnMouseClicked(event -> Platform.exit());
+
+        Label over = new Label();
+        over.setText("You Died!");
+
+        layout3.getChildren().addAll(over);
+        layout.getChildren().addAll(menu, quit);
+        layout2.getChildren().addAll(layout3, layout);
+        gameOverUI.getChildren().addAll(bg, layout2);
 
     }
 
@@ -245,6 +359,16 @@ public class GameTimer extends AnimationTimer {
     private void resumeGame(Pane uiRoot) {
         uiRoot.getChildren().removeAll(pauseUI, matte);
         isPaused = false;
+    }
+    private void gameOver(Pane uiRoot) {
+        uiRoot.getChildren().addAll(matte, gameOverUI);
+        isPaused = true;
+    }
+    private void stageClear(Pane uiRoot) {
+        if (levelData == LevelData.LEVEL1) StageMenu.levels.put("level2", true);
+        if (levelData == LevelData.LEVEL2) StageMenu.levels.put("level3", true);
+        uiRoot.getChildren().addAll(matte, stageClearUI);
+        isPaused = true;
     }
 
     private void startGameTimer(){
@@ -316,8 +440,6 @@ public class GameTimer extends AnimationTimer {
 
     private void movePlayerY(int value) {
         boolean movingDown = value > 0;
-        double fallSpeed = 1.0;
-
 
         for (int i = 0; i < Math.abs(value); i++) {
             for (Node platform : platforms) {
@@ -392,11 +514,30 @@ public class GameTimer extends AnimationTimer {
         player_hp--;
     }
 
+    public void moveEnemy() {
+        for (Enemy enemy : enemies) {
+            enemy.move();
+        }
+    }
+
     private void collideCoin() {
+        if (coins.isEmpty()) return;
         for (Node coin : coins) {
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
                 player_coins++;
                 gameRoot.getChildren().remove(coin);
+                coins.remove(coin);
+            }
+        }
+    }
+
+    private void collideEnemy() {
+        for (Enemy enemy : enemies) {
+            if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
+                if (!invulnerable) {
+                    damagePlayer();
+                    invulnerabilityTimer();
+                }
             }
         }
     }
@@ -428,6 +569,44 @@ public class GameTimer extends AnimationTimer {
 
         gameRoot.getChildren().add(entity);
         return entity;
+    }
+    private BasicEnemy createEnemy(int x, int y, Pane gameRoot) {
+        BasicEnemy entity = new BasicEnemy(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+
+    private void backToMenu() {
+        this.stop();
+        primaryStage.setScene(mainMenu);
+        primaryStage.setFullScreen(true);
+        primaryStage.setResizable(false);
+    }
+
+    private boolean isCleared() {
+        if (levelData == LevelData.LEVEL1) {
+            return gameTimer >= 10;
+        }
+        if (levelData == LevelData.LEVEL2) {
+            return coins.isEmpty() && enemies.isEmpty();
+        }
+        if (levelData == LevelData.LEVEL3) {
+            return gameTimer >= 10;
+        }
+        if (levelData == LevelData.BONUS_LEVEL) {
+            return gameTimer >= 10;
+        }
+        return false;
+    }
+
+    private void nextLevel() {
+        // instead na ganito, gagawa nalang ako ng level picker tas dun babalik
+        // kumbaga mauunlock lang ung next levels
+        this.stop();
+        primaryStage.setScene(mainMenu);
+        primaryStage.setFullScreen(true);
+        primaryStage.setResizable(false);
     }
 
     private boolean isPressed(KeyCode key) {
