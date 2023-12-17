@@ -155,12 +155,12 @@ public class GameTimer extends AnimationTimer {
                 switch (line.charAt(j)) {
                     case '1':
                         tile = new ImagePattern(new Image("images/Crate.png"));
-                        platform = createEntity(j * 120, i * 120, tile, gameRoot);
+                        platform = createMap(j * 120, i * 120, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '2':
                         tile = new ImagePattern(new Image("images/StreetTile1.png"));
-                        platform = createEntity(j * 120, i * 120, tile, gameRoot);
+                        platform = createMap(j * 120, i * 120, tile, gameRoot);
 
                         platforms.add(platform);
                         break;
