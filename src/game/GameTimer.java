@@ -132,8 +132,10 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void initContent(Pane gameRoot, String[] levelData) {
-        gameRoot.setPrefSize(1920 * 120, 1080 * 2);
-        Image bg = new Image("images/colored_land.png", 0, 1080 * 2, false, true);
+
+        gameRoot.setPrefSize(1920 * 20, 1080*2);
+        Image bg = new Image("images/City3.png", 0, 1080 * 2, false, true);
+
         ImagePattern tile;
         Node platform;
         // create Background
@@ -152,13 +154,14 @@ public class GameTimer extends AnimationTimer {
             for (int j = 0; j < line.length(); j++) {
                 switch (line.charAt(j)) {
                     case '1':
-                        tile = new ImagePattern(new Image("images/grassMid.png"));
-                        platform = createMap(j * 120, i * 120, tile, gameRoot);
+                        tile = new ImagePattern(new Image("images/Crate.png"));
+                        platform = createEntity(j * 120, i * 120, tile, gameRoot);
                         platforms.add(platform);
                         break;
                     case '2':
-                        tile = new ImagePattern(new Image("images/grassCenter.png"));
-                        platform = createMap(j * 120, i * 120, tile, gameRoot);
+                        tile = new ImagePattern(new Image("images/StreetTile1.png"));
+                        platform = createEntity(j * 120, i * 120, tile, gameRoot);
+
                         platforms.add(platform);
                         break;
                     case '3':
@@ -695,7 +698,7 @@ public class GameTimer extends AnimationTimer {
     private void backToMenu() {
         this.stop();
         primaryStage.setScene(mainMenu);
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
         primaryStage.setResizable(false);
     }
 

@@ -2,6 +2,7 @@ package game;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -17,15 +18,19 @@ public class MainMenu {
         VBox buttons = new VBox();
         layout.setAlignment(Pos.CENTER);
         buttons.setAlignment(Pos.CENTER);
+        buttons.setTranslateY(75);
         buttons.setSpacing(20);
-
         Scene scene = new Scene(layout, 1920 , 1080);
         Credits credits = new Credits(layout);
 
-        Image bg = new Image("images/colored_land.png");
-        ImageView image2 = new ImageView("images/play button.png");
-        ImageView image3 = new ImageView("images/options_button.png");
-        ImageView image4 = new ImageView("images/quit_button.png");
+        Image bg = new Image("images/tempbg.png");
+        ImageView title = new ImageView("images/UI Elements/title.png");
+        title.setFitWidth(1000);
+        title.setPreserveRatio(true);
+        title.setTranslateY(-250);
+        ImageView image2 = new ImageView("images/UI Elements/play_button.png");
+        ImageView image3 = new ImageView("images/UI Elements/credits_button.png");
+        ImageView image4 = new ImageView("images/UI Elements/quit_button.png");
         Button button = new Button("", image2);
         Button button2 = new Button("", image3);
         Button button3 = new Button("", image4);
@@ -49,10 +54,10 @@ public class MainMenu {
 
 
         buttons.getChildren().addAll(button, button2, button3);
-        layout.getChildren().addAll(buttons);
+        layout.getChildren().addAll(title, buttons);
 
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
