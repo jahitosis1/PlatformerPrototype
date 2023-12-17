@@ -37,8 +37,13 @@ public class GameStage {
     this.stage.setMinWidth(WINDOW_WIDTH);
     this.stage.setMinHeight(WINDOW_HEIGHT);
 
+<<<<<<< Updated upstream
     this.stage.setFullScreen(true);
     this.stage.setResizable(false);
+=======
+    stage.setFullScreen(false);
+    stage.setResizable(false);
+>>>>>>> Stashed changes
 
     this.gameTimer.start();
     this.stage.show();

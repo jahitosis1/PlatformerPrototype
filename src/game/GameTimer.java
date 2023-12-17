@@ -78,6 +78,11 @@ public class GameTimer extends AnimationTimer {
     private void initContent(Pane gameRoot) {
         gameRoot.setPrefSize(1920 * 20, 1080);
         Image bg = new Image("images/City3.png");
+<<<<<<< Updated upstream
+=======
+        ImagePattern tile;
+        Node platform;
+>>>>>>> Stashed changes
         // create Background
         BackgroundImage backgroundimage = new BackgroundImage(bg,
                 BackgroundRepeat.REPEAT,
@@ -245,6 +250,59 @@ public class GameTimer extends AnimationTimer {
         gameRoot.getChildren().add(entity);
         return entity;
     }
+<<<<<<< Updated upstream
+=======
+    private NPC createNPC(int x, int y, Pane gameRoot) {
+        NPC entity = new NPC(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+    private Coin createCoin(int x, int y, Pane gameRoot) {
+        Coin entity = new Coin(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+    private BasicEnemy createEnemy(int x, int y, Pane gameRoot) {
+        BasicEnemy entity = new BasicEnemy(x, y);
+
+        gameRoot.getChildren().add(entity);
+        return entity;
+    }
+
+    private void backToMenu() {
+        this.stop();
+        primaryStage.setScene(mainMenu);
+        primaryStage.setFullScreen(false);
+        primaryStage.setResizable(false);
+    }
+
+    private boolean isCleared() {
+        if (levelData == LevelData.LEVEL1) {
+            return gameTimer >= 10;
+        }
+        if (levelData == LevelData.LEVEL2) {
+            return coins.isEmpty() && enemies.isEmpty();
+        }
+        if (levelData == LevelData.LEVEL3) {
+            return gameTimer >= 10;
+        }
+        if (levelData == LevelData.BONUS_LEVEL) {
+            return gameTimer >= 10;
+        }
+        return false;
+    }
+
+    private void nextLevel() {
+        // instead na ganito, gagawa nalang ako ng level picker tas dun babalik
+        // kumbaga mauunlock lang ung next levels
+        this.stop();
+        primaryStage.setScene(mainMenu);
+        primaryStage.setFullScreen(false);
+        primaryStage.setResizable(false);
+    }
+>>>>>>> Stashed changes
 
     private boolean isPressed(KeyCode key) {
         return keys.getOrDefault(key, false);
