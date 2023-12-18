@@ -484,7 +484,7 @@ public class GameTimer extends AnimationTimer {
                             return;
                         }
                     } else {
-                        if (player.getTranslateY() == platform.getTranslateY() + 120) return;
+                        if (player.getTranslateY() <= platform.getTranslateY() + 120) return;
                     }
                 }
             }
