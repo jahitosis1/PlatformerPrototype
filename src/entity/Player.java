@@ -1,15 +1,17 @@
 package entity;
 
-import javafx.animation.Animation;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.scene.image.Image;
+import javafx.util.Duration;
 
 public class Player extends Sprite {
     private final static int PLAYER_SIZE = 80;
-    public final static Image PLAYER_SPRITE_IDLE = new Image("images/Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
-    public final static Image PLAYER_SPRITE_MOVE7 = new Image("images/Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
-    public final static Image PLAYER_SPRITE_JUMP = new Image("images/Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    private final static Image PLAYER_SPRITE_IDLE = new Image("images/Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    private final static Image PLAYER_SPRITE_MOVE7 = new Image("images/Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    private final static Image PLAYER_SPRITE_JUMP = new Image("images/Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     public boolean isJumping = true;
+    public boolean invulnerable = false;
+    public int player_hp = 10;
 
 
     public Player(int x_pos, int y_pos) {
@@ -53,4 +55,39 @@ public class Player extends Sprite {
         jumpAnimation.stop();
         isJumping = false;
     }
+    private void invulnerabilityTimer() {
+        // Change invulnerable to true
+        invulnerable = true;
+
+        // Create a FadeTransition on the player
+        FadeTransition fade = new FadeTransition(Duration.seconds(3), this);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setDuration(Duration.millis(250));
+        fade.setAutoReverse(true);
+        fade.setCycleCount(Transition.INDEFINITE);
+
+        // Start the FadeTransition
+        fade.play();
+
+        // Create a PauseTransition with a duration of 3 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+
+        // Set a ChangeListener to change invulnerable back to false after the pause
+        pause.setOnFinished(event -> {
+            invulnerable = false;
+            fade.stop();
+        });
+
+        // Start the PauseTransition
+        pause.play();
+    }
+
+    public void damagePlayer(int value) {
+        if (!invulnerable) {
+            player_hp -= value;
+            invulnerabilityTimer();
+        }
+    }
+
 }

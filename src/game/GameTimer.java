@@ -67,8 +67,8 @@ public class GameTimer extends AnimationTimer {
         this.gameRoot = gameRoot;
         this.uiRoot = uiRoot;
         this.levelData = levelData;
-        clearAll();
         initContent(gameRoot, levelData);
+        initViewport();
         initUI(uiRoot);
         initPauseUI(uiRoot);
         initClearUI();
@@ -102,7 +102,6 @@ public class GameTimer extends AnimationTimer {
 
     private void update() {
         if (!isPaused) {
-//            if (isPressed(KeyCode.W) && player.getTranslateY() >= 5) jumpPlayer();
             if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.3);
             if (isPressed(KeyCode.A) && player.getTranslateX() >= 5) movePlayerX(-3);
             if (isPressed(KeyCode.D) && player.getTranslateX() + 40 <= levelWidth - 5) movePlayerX(3);
@@ -115,7 +114,7 @@ public class GameTimer extends AnimationTimer {
             collideEnemy();
             collideTrap();
             updateUI();
-            if (player_hp <= 0) gameOver(uiRoot);
+            if (player.player_hp <= 0) gameOver(uiRoot);
             if (isCleared()) stageClear(uiRoot);
         }
     }
@@ -128,10 +127,10 @@ public class GameTimer extends AnimationTimer {
         coins.clear();
         enemies.clear();
         player_coins = 0;
-        player_hp = 10;
     }
 
     private void initContent(Pane gameRoot, String[] levelData) {
+        clearAll();
 
         gameRoot.setPrefSize(1920 * 20, 1080*2);
         Image bg = new Image("images/City3.png", 0, 1080 * 2, false, true);
@@ -148,6 +147,9 @@ public class GameTimer extends AnimationTimer {
         levelWidth = levelData[0].length() * 120;
         levelHeight = levelData.length * 120;
         gameRoot.setBackground(background);
+
+        player = createPlayer(130, levelHeight - 550, gameRoot);
+        player.player_hp = 10;
 
         for (int i = 0; i < levelData.length; i++) {
             String line = levelData[i];
@@ -194,25 +196,6 @@ public class GameTimer extends AnimationTimer {
             }
         }
 
-        player = createPlayer(130, levelHeight - 550, gameRoot);
-        System.out.println(player.getTranslateY());
-        player.translateXProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
-            if (offset > GameStage.WINDOW_WIDTH / 2 && offset < levelWidth - GameStage.WINDOW_WIDTH / 2) {
-                gameRoot.setLayoutX(-(offset - (double) GameStage.WINDOW_WIDTH / 2));
-            }
-        });
-
-        player.translateYProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
-            int windowHeight = 1080; // The height of the window
-            if (offset > windowHeight * 3 / 4 && offset < levelHeight - windowHeight / 2) {
-                gameRoot.setLayoutY(-(offset - (double) windowHeight / 2));
-            }
-        });
-
-        player_hp = 10;
-        player_coins = 0;
     }
 
     private void initUI(Pane uiRoot) {
@@ -227,7 +210,7 @@ public class GameTimer extends AnimationTimer {
 
         healthPoints.setLayoutX(50);
         healthPoints.setLayoutY(50);
-        healthPoints.setText("HP: " + player_hp);
+        healthPoints.setText("HP: " + player.player_hp);
 
         coin_count.setLayoutX(50);
         coin_count.setLayoutY(75);
@@ -379,9 +362,26 @@ public class GameTimer extends AnimationTimer {
         gameOverUI.getChildren().addAll(bg, layout2);
 
     }
+    private void initViewport(){
+        System.out.println(player.getTranslateY());
+        player.translateXProperty().addListener((obs, old, newValue) -> {
+            int offset = newValue.intValue();
+            if (offset > GameStage.WINDOW_WIDTH / 2 && offset < levelWidth - GameStage.WINDOW_WIDTH / 2) {
+                gameRoot.setLayoutX(-(offset - (double) GameStage.WINDOW_WIDTH / 2));
+            }
+        });
+
+        player.translateYProperty().addListener((obs, old, newValue) -> {
+            int offset = newValue.intValue();
+            int windowHeight = 1080; // The height of the window
+            if (offset > windowHeight * 3 / 4 && offset < levelHeight - windowHeight / 2) {
+                gameRoot.setLayoutY(-(offset - (double) windowHeight / 2));
+            }
+        });
+    }
 
     private void updateUI() {
-        healthPoints.setText("HP: " + player_hp);
+        healthPoints.setText("HP: " + player.player_hp);
         coin_count.setText("Coins: " + player_coins);
         time.setText("Time: " + gameTimer);
     }
@@ -475,7 +475,7 @@ public class GameTimer extends AnimationTimer {
                 if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
                     if (movingDown) {
                         if (player.getTranslateY() + 80 >= platform.getTranslateY()
-                                && player.getTranslateY() + 80 < platform.getTranslateY() + 120
+                                && player.getTranslateY() + 80 < platform.getTranslateY() + 100
                                 && (player.getTranslateX() + 80 != platform.getTranslateX()
                                 && player.getTranslateX() != platform.getTranslateX() + 120)) {
                             player.setTranslateY(player.getTranslateY() - 1);
@@ -492,34 +492,6 @@ public class GameTimer extends AnimationTimer {
         }
     }
 
-    private void invulnerabilityTimer() {
-        // Change invulnerable to true
-        invulnerable = true;
-
-        // Create a FadeTransition on the player
-        FadeTransition fade = new FadeTransition(Duration.seconds(3), player);
-        fade.setFromValue(1.0);
-        fade.setToValue(0.0);
-        fade.setDuration(Duration.millis(250));
-        fade.setAutoReverse(true);
-        fade.setCycleCount(Transition.INDEFINITE);
-
-        // Start the FadeTransition
-        fade.play();
-
-        // Create a PauseTransition with a duration of 3 seconds
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-
-        // Set a ChangeListener to change invulnerable back to false after the pause
-        pause.setOnFinished(event -> {
-            invulnerable = false;
-            fade.stop();
-        });
-
-        // Start the PauseTransition
-        pause.play();
-    }
-
     private void jumpPlayer() {
         if (canJump > 0) {
             playerVelocity = playerVelocity.add(0, -jumpPower);
@@ -528,36 +500,9 @@ public class GameTimer extends AnimationTimer {
         }
     }
 
-    private void damagePlayer(int value) {
-        if (!invulnerable) {
-            player_hp -= value;
-            invulnerabilityTimer();
-        }
-    }
-
     public void moveEnemy() {
         for (Enemy enemy : enemies) {
-            if (enemy instanceof FlyingEnemy) {
-                if (player.getBoundsInParent().intersects(((FlyingEnemy) enemy).searchRadius.getBoundsInParent())) {
-                    double diffX = player.getTranslateX() - enemy.getTranslateX();
-                    double diffY = player.getTranslateY() - enemy.getTranslateY();
-
-                    double angle = Math.atan2(diffY, diffX);
-
-                    double speed = 1.5; // The speed of the enemy
-
-                    enemy.setTranslateX(enemy.getTranslateX() + speed * Math.cos(angle));
-                    enemy.setTranslateY(enemy.getTranslateY() + speed * Math.sin(angle));
-
-                    if (Math.cos(angle) > 0) enemy.setScaleX(1);
-                    if (Math.cos(angle) < 0) enemy.setScaleX(-1);
-
-                }else{
-                    ((FlyingEnemy) enemy).returnToPos();
-                }
-            }else if (enemy instanceof BasicEnemy) {
                 enemy.move();
-            }
 
             for (Node platform : platforms) {
                 if (enemy.getBoundsInParent().intersects(platform.getBoundsInParent())) {
@@ -565,10 +510,7 @@ public class GameTimer extends AnimationTimer {
                         enemy.setTranslateY(enemy.getTranslateY() - 1);
                         return;
                     }
-                    if (enemy.getTranslateX() + 100 == platform.getTranslateX()) {
-                        enemy.setTranslateX(enemy.getTranslateX() - 1);
-                        return;
-                    }
+                    if (enemy.getTranslateX() + 100 == platform.getTranslateX()) return;
                 }
             }
             if (enemy instanceof BasicEnemy) enemy.setTranslateY(enemy.getTranslateY() + 1);
@@ -613,10 +555,10 @@ public class GameTimer extends AnimationTimer {
         for (Enemy enemy : enemies) {
             if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
                 if (enemy instanceof FlyingEnemy) {
-                    damagePlayer(5);
+                    player.damagePlayer(5);
                     if (!killBuff) continue;
                 }
-                if (player.getTranslateY() + 80 > enemy.getTranslateY() + 10) damagePlayer(3);
+                if (player.getTranslateY() + 80 > enemy.getTranslateY() + 10) player.damagePlayer(3);
                 enemies.remove(enemy);
                 gameRoot.getChildren().remove(enemy);
             }
@@ -645,7 +587,7 @@ public class GameTimer extends AnimationTimer {
             );
 
             if (player.getBoundsInParent().intersects(bottomTrapBounds)) {
-                damagePlayer(1);
+                player.damagePlayer(1);
             }
         }
     }
@@ -689,7 +631,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private FlyingEnemy createEliteEnemy(int x, int y, Pane gameRoot) {
-        FlyingEnemy entity = new FlyingEnemy(x, y);
+        FlyingEnemy entity = new FlyingEnemy(x, y, player);
 
         gameRoot.getChildren().add(entity);
         return entity;
@@ -719,16 +661,15 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void nextLevel() {
-        // instead na ganito, gagawa nalang ako ng level picker tas dun babalik
-        // kumbaga mauunlock lang ung next levels
+        // go to next level after clear
         this.stop();
         if (levelData == LevelData.LEVEL1) {
             GameStage theStage = new GameStage(primaryStage, mainMenu, LevelData.LEVEL2);
-            theStage.setStage(primaryStage);
+            theStage.setStage();
         }
         if (levelData == LevelData.LEVEL2) {
             GameStage theStage = new GameStage(primaryStage, mainMenu, LevelData.LEVEL3);
-            theStage.setStage(primaryStage);
+            theStage.setStage();
         }
         if (levelData == LevelData.BONUS_LEVEL || levelData == LevelData.LEVEL3) {
             primaryStage.setScene(mainMenu);

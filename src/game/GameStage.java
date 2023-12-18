@@ -14,16 +14,18 @@ public class GameStage {
   private final Pane uiRoot;
   private final Scene scene;
   private final GameTimer gameTimer;
+  private final Stage stage;
 
-  public GameStage(Stage primaryStage, Scene previousScene, String[] levelData) {
+  public GameStage(Stage stage, Scene previousScene, String[] levelData) {
     this.root = new Group();
     this.gameRoot = new Pane();
     this.uiRoot = new Pane();
     this.scene = new Scene(root, GameStage.WINDOW_WIDTH, GameStage.WINDOW_HEIGHT);
-    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene, primaryStage, previousScene, levelData);
+    this.stage = stage;
+    this.gameTimer = new GameTimer(gameRoot, uiRoot, scene, stage, previousScene, levelData);
   }
 
-  public void setStage(Stage stage) {
+  public void setStage() {
 
     // set stage elements here
     this.root.getChildren().addAll(gameRoot, uiRoot);
@@ -34,7 +36,7 @@ public class GameStage {
     stage.setMinWidth(WINDOW_WIDTH);
     stage.setMinHeight(WINDOW_HEIGHT);
 
-    stage.setFullScreen(false);
+    stage.setFullScreen(true);
     stage.setResizable(false);
 
     this.gameTimer.start();
