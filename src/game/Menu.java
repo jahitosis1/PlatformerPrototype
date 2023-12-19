@@ -1,6 +1,9 @@
 package game;
 
+import java.io.File;
+
 import javafx.geometry.Pos;
+import javafx.scene.media.*;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -10,6 +13,7 @@ public abstract class Menu {
     protected final StackPane layout;
     protected final Scene scene;
     protected final Stage primaryStage;
+    protected final Media music = new Media(new File("images/Eight_Bit_Undercover.mp3").toURI().toString());
     public Menu(Stage primaryStage) {
         layout = new StackPane();
 
@@ -18,11 +22,11 @@ public abstract class Menu {
         scene = new Scene(layout, 1920 , 1080);
         this.primaryStage = primaryStage;
         setStage(scene);
-
     }
 
     public void setStage(Scene scene) {
-
+    	MediaPlayer playMusic = new MediaPlayer(music);
+        playMusic.play();
         Image bg = new Image("images/tempbg.png");
         BackgroundImage backgroundimage = new BackgroundImage(bg,
                 BackgroundRepeat.REPEAT,

@@ -131,7 +131,6 @@ public class GameTimer extends AnimationTimer {
 
     private void initContent(Pane gameRoot, String[] levelData) {
         clearAll();
-
         gameRoot.setPrefSize(1920 * 20, 1080*2);
         Image bg = new Image("images/City3.png", 0, 1080 * 2, false, true);
 
