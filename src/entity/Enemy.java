@@ -3,7 +3,7 @@ package entity;
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 
-public abstract class Enemy extends Sprite{
+public abstract class Enemy extends Sprite {
     protected final static int ENEMY_SIZE = 100;
     protected Timeline deathAnimation;
     protected double orig_x;

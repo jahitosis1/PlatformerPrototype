@@ -2,7 +2,6 @@ package entity;
 
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
-import javafx.scene.shape.Rectangle;
 
 public class Coin extends Sprite {
     private final static int COIN_SIZE = 120;

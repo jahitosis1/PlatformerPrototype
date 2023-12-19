@@ -2,7 +2,6 @@ package entity;
 
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
-import javafx.scene.shape.Rectangle;
 
 public class NPC extends Sprite {
     private final static int NPC_SIZE = 120;

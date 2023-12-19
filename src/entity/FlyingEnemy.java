@@ -5,7 +5,7 @@ import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Circle;
 
-public class FlyingEnemy extends Enemy{
+public class FlyingEnemy extends Enemy {
 
     public Circle searchRadius;
     private final static Image ENEMY_SPRITE_IDLE = new Image("images/Tengu_Fly_0.png", ENEMY_SIZE, ENEMY_SIZE, false, false);

@@ -1,26 +1,33 @@
 package game;
 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import entity.*;
-import javafx.animation.*;
+import javafx.animation.AnimationTimer;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
-import javafx.geometry.*;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.Node;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameTimer extends AnimationTimer {
 
@@ -32,8 +39,9 @@ public class GameTimer extends AnimationTimer {
     private final ArrayList<Node> coins = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
     private final String[] levelData;
-    private int player_hp;
     private int player_coins;
+    private int enemies_killed;
+    private int score_int;
     private int levelWidth;
     private int levelHeight;
     private int canJump = 2;
@@ -45,6 +53,8 @@ public class GameTimer extends AnimationTimer {
     private Label healthPoints;
     private Label time;
     private Label coin_count;
+    private Label score;
+    private Label coins_collected;
     private Pane pauseUI;
     private Pane gameOverUI;
     private Pane stageClearUI;
@@ -127,6 +137,8 @@ public class GameTimer extends AnimationTimer {
         coins.clear();
         enemies.clear();
         player_coins = 0;
+        enemies_killed = 0;
+        score_int = 0;
     }
 
     private void initContent(Pane gameRoot, String[] levelData) {
@@ -207,17 +219,36 @@ public class GameTimer extends AnimationTimer {
         time = new Label();
         coin_count = new Label();
 
+        ImageView hp_indicator = new ImageView("images/UI Elements/hudHeart.png");
+        ImageView coin_indicator = new ImageView("images/UI Elements/Coin_0.png");
+
+        hp_indicator.setFitWidth(100);
+        hp_indicator.setFitHeight(100);
+        coin_indicator.setFitWidth(100);
+        coin_indicator.setFitHeight(100);
+
+        hp_indicator.setPreserveRatio(true);
+        coin_indicator.setPreserveRatio(true);
+
         healthPoints.setLayoutX(50);
         healthPoints.setLayoutY(50);
-        healthPoints.setText("HP: " + player.player_hp);
+        healthPoints.setText("  " + player.player_hp);
+        healthPoints.setFont(new Font("ArcadeClassic", 64));
+        healthPoints.setStyle("-fx-text-fill: white;");
+        healthPoints.setGraphic(hp_indicator);
 
         coin_count.setLayoutX(50);
-        coin_count.setLayoutY(75);
-        coin_count.setText("Coins: " + player_coins);
+        coin_count.setLayoutY(175);
+        coin_count.setText("  " + player_coins);
+        coin_count.setFont(new Font("ArcadeClassic", 64));
+        coin_count.setStyle("-fx-text-fill: white;");
+        coin_count.setGraphic(coin_indicator);
 
-        time.setLayoutX((double) 1920 / 2);
+        time.setLayoutX((double) 1920 / 2 - 50);
         time.setLayoutY(50);
         time.setText("Time: " + player_coins);
+        time.setFont(new Font("ArcadeClassic", 64));
+        time.setStyle("-fx-text-fill: white;");
 
         pause.setOnMouseClicked(e -> pauseGame(uiRoot));
 
@@ -279,10 +310,18 @@ public class GameTimer extends AnimationTimer {
         layout2.setPrefSize(500, 400);
         layout2.setSpacing(20);
 
-        HBox layout3 = new HBox();
+        VBox layout3 = new VBox();
         layout3.setAlignment(Pos.CENTER);
         layout3.setPrefSize(500, 400);
         layout3.setSpacing(20);
+
+        HBox layout4 = new HBox();
+        layout4.setAlignment(Pos.CENTER);
+        layout4.setPrefSize(500, 400);
+        layout4.setSpacing(20);
+
+        score = new Label();
+        coins_collected = new Label();
 
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
@@ -307,7 +346,8 @@ public class GameTimer extends AnimationTimer {
         Label cleared = new Label();
         cleared.setText("Stage CLear!");
 
-        layout3.getChildren().addAll(cleared);
+        layout4.getChildren().addAll(score, coins_collected);
+        layout3.getChildren().addAll(cleared, layout4);
         layout.getChildren().addAll(next_level, menu, quit);
         layout2.getChildren().addAll(layout3, layout);
         stageClearUI.getChildren().addAll(bg, layout2);
@@ -380,8 +420,8 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void updateUI() {
-        healthPoints.setText("HP: " + player.player_hp);
-        coin_count.setText("Coins: " + player_coins);
+        healthPoints.setText("  " + player.player_hp);
+        coin_count.setText("  " + player_coins);
         time.setText("Time: " + gameTimer);
     }
 
@@ -404,6 +444,10 @@ public class GameTimer extends AnimationTimer {
         if (levelData == LevelData.LEVEL1) StageMenu.levels.put("level2", true);
         if (levelData == LevelData.LEVEL2) StageMenu.levels.put("level3", true);
         uiRoot.getChildren().addAll(matte, stageClearUI);
+        score_int = ((100/(int) gameTimer) + player_coins - (10 - player.player_hp) + enemies_killed) * 100;
+        score.setText("score: " + score_int);
+        coins_collected.setText("Coins: " + player_coins);
+
         isPaused = true;
     }
 
@@ -417,7 +461,6 @@ public class GameTimer extends AnimationTimer {
                 if (!isPaused) {
                     count++;
                     gameTimer = (double) count / 100;
-//                    Platform.runLater(() -> gameTimer = count);
                 }
             }
         }, 0, 10); // Start the timer immediately and update every 1000 milliseconds (1 second)
@@ -638,9 +681,7 @@ public class GameTimer extends AnimationTimer {
 
     private void backToMenu() {
         this.stop();
-        primaryStage.setScene(mainMenu);
-        primaryStage.setFullScreen(false);
-        primaryStage.setResizable(false);
+        new StageMenu(primaryStage);
     }
 
     private boolean isCleared() {
