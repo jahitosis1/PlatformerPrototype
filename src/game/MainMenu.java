@@ -27,7 +27,7 @@ public class MainMenu extends Menu{
         title.setTranslateY(-250);
 
         ImageView image2 = new ImageView("images/UI Elements/play_button.png");
-        ImageView image3 = new ImageView("images/UI Elements/play_button.png");
+        ImageView image3 = new ImageView("images/UI Elements/about_button.png");
         ImageView image4 = new ImageView("images/UI Elements/credits_button.png");
         ImageView image5 = new ImageView("images/UI Elements/quit_button.png");
 

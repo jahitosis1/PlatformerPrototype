@@ -27,17 +27,23 @@ public class About extends Menu{
         cluster.setAlignment(Pos.CENTER);
         cluster.setSpacing(20);
         
-        Rectangle window1 = new Rectangle(1520, 400, Color.LIGHTBLUE);
-        Rectangle window2 = new Rectangle(1520, 400, Color.LIGHTBLUE);
+        ImageView tutorial = new ImageView("images/UI Elements/tutorial.png");
+        ImageView ref = new ImageView("images/UI Elements/references.png");
+        
+        Rectangle rect1 = new Rectangle(1520, 400, Color.LIGHTBLUE);
+        Rectangle rect2 = new Rectangle(1520, 400, Color.LIGHTBLUE);
 
-        window1.setOpacity(0.7);
-        window2.setOpacity(0.7);
+        rect1.setOpacity(0.7);
+        rect2.setOpacity(0.7);
 
-        window1.setArcHeight(20);
-        window1.setArcWidth(20);
-        window2.setArcHeight(20);
-        window2.setArcWidth(20);
-
+        rect1.setArcHeight(20);
+        rect2.setArcHeight(20);
+        rect1.setArcWidth(20);
+        rect2.setArcWidth(20);
+        
+        StackPane window1 = new StackPane(rect1, tutorial);
+        StackPane window2 = new StackPane(rect2, ref);
+        
         cluster.getChildren().addAll(window1, window2);
 
         Button resume = new Button("", closeButton);

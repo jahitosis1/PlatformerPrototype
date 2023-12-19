@@ -8,7 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.util.HashMap;
 
 public class StageMenu extends Menu{
@@ -27,11 +26,19 @@ public class StageMenu extends Menu{
     protected void initContent(StackPane layout) {
         HBox buttons = new HBox();
         buttons.setAlignment(Pos.CENTER);
-
-        buttons.setSpacing(20);
-        ImageView image2 = new ImageView("images/play_button.png");
-        ImageView image3 = new ImageView("images/options_button.png");
-        ImageView image4 = new ImageView("images/quit_button.png");
+        buttons.setTranslateX(40);
+        Pane labelPane = new Pane();
+        ImageView label = new ImageView("images/UI Elements/label.png");
+        labelPane.getChildren().addAll(label);
+        label.setFitWidth(600);
+        label.setPreserveRatio(true);
+        label.setX(635);
+        label.setY(20);
+        
+        buttons.setSpacing(65);
+        ImageView image2 = new ImageView("images/UI Elements/level1.png");
+        ImageView image3 = new ImageView("images/UI Elements/level2.png");
+        ImageView image4 = new ImageView("images/UI Elements/level3.png");
         ImageView backImg =  new ImageView("images/UI Elements/UI_Flat_Cross_Large.png");
 
         Button button = new Button("", image2);
@@ -75,6 +82,6 @@ public class StageMenu extends Menu{
 
         buttons.getChildren().addAll(button, button2, button3, button4);
 
-        layout.getChildren().addAll(buttons, back);
+        layout.getChildren().addAll(labelPane, buttons, back);
     }
 }
