@@ -12,48 +12,51 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class About extends Menu{
-    public About(Stage primaryStage) {
-        super(primaryStage);
-    }
+  public About(Stage primaryStage) {
+    super(primaryStage);
+  }
 
-    @Override
-    protected void initContent(StackPane layout) {
+  @Override
+  protected void initContent(StackPane layout) {
 
-        ImageView closeButton =  new ImageView("images/UI Elements/UI_Flat_Cross_Large.png");
+    ImageView closeButton =  new ImageView("images/UI Elements/UI_Flat_Cross_Large.png");
 
-        VBox cluster = new VBox();
-        cluster.setTranslateY(50);
-        cluster.setPrefSize(1920, 1080);
-        cluster.setAlignment(Pos.CENTER);
-        cluster.setSpacing(20);
-        
-        ImageView tutorial = new ImageView("images/UI Elements/tutorial.png");
-        ImageView ref = new ImageView("images/UI Elements/references.png");
-        
-        Rectangle rect1 = new Rectangle(1520, 400, Color.LIGHTBLUE);
-        Rectangle rect2 = new Rectangle(1520, 400, Color.LIGHTBLUE);
+    VBox cluster = new VBox();
+    cluster.setTranslateY(50);
+    cluster.setPrefSize(1920, 1080);
+    cluster.setAlignment(Pos.CENTER);
+    cluster.setSpacing(20);
 
-        rect1.setOpacity(0.7);
-        rect2.setOpacity(0.7);
+    ImageView tutorial = new ImageView("images/UI Elements/tutorial.png");
+    ImageView ref = new ImageView("images/UI Elements/references.png");
 
-        rect1.setArcHeight(20);
-        rect2.setArcHeight(20);
-        rect1.setArcWidth(20);
-        rect2.setArcWidth(20);
-        
-        StackPane window1 = new StackPane(rect1, tutorial);
-        StackPane window2 = new StackPane(rect2, ref);
-        
-        cluster.getChildren().addAll(window1, window2);
+    Rectangle rect1 = new Rectangle(1520, 400, Color.LIGHTBLUE);
+    Rectangle rect2 = new Rectangle(1520, 400, Color.LIGHTBLUE);
 
-        Button resume = new Button("", closeButton);
+    rect1.setOpacity(0.7);
+    rect2.setOpacity(0.7);
 
-        resume.setStyle("-fx-background-color: transparent;");
-        resume.setTranslateX(850);
-        resume.setTranslateY(-450);
+    rect1.setArcHeight(20);
+    rect2.setArcHeight(20);
+    rect1.setArcWidth(20);
+    rect2.setArcWidth(20);
 
-        resume.setOnAction(e -> new MainMenu(primaryStage));
+    StackPane window1 = new StackPane(rect1, tutorial);
+    StackPane window2 = new StackPane(rect2, ref);
 
-        layout.getChildren().addAll(cluster, resume);
-    }
+    cluster.getChildren().addAll(window1, window2);
+
+    Button resume = new Button("", closeButton);
+
+    resume.setStyle("-fx-background-color: transparent;");
+    resume.setTranslateX(850);
+    resume.setTranslateY(-450);
+
+    resume.setOnAction(e -> {
+      playMusic.stop();
+      new MainMenu(primaryStage);
+    });
+
+    layout.getChildren().addAll(cluster, resume);
+  }
 }
