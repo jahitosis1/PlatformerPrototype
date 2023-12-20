@@ -327,6 +327,11 @@ public class GameTimer extends AnimationTimer {
         score = new Label();
         coins_collected = new Label();
 
+        score.setFont(new Font("ArcadeClassic", 34));
+//        score.setStyle("-fx-text-fill: white;");
+        coins_collected.setFont(new Font("ArcadeClassic", 34));
+//        coins_collected.setStyle("-fx-text-fill: white;");
+
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
 
@@ -334,12 +339,16 @@ public class GameTimer extends AnimationTimer {
         Button next_level = new Button("next level");
         Button menu = new Button("main menu");
         Button quit = new Button("quit");
+
         next_level.setMinSize(100, 50);
         next_level.setMaxSize(100, 50);
+
         menu.setMinSize(100, 50);
         menu.setMaxSize(100, 50);
+
         quit.setMinSize(100, 50);
         quit.setMaxSize(100, 50);
+
         next_level.setOnAction(event -> nextLevel());
         menu.setOnAction(event -> backToMenu());
         quit.setOnAction(event -> {
@@ -349,6 +358,8 @@ public class GameTimer extends AnimationTimer {
 
         Label cleared = new Label();
         cleared.setText("Stage CLear!");
+        cleared.setFont(new Font("ArcadeClassic", 64));
+//        cleared.setStyle("-fx-text-fill: white;");
         cleared.setTranslateY(50);
 
         layout4.getChildren().addAll(score, coins_collected);
@@ -399,6 +410,8 @@ public class GameTimer extends AnimationTimer {
 
         Label over = new Label();
         over.setText("You Died!");
+        over.setFont(new Font("ArcadeClassic", 64));
+//        over.setStyle("-fx-text-fill: white;");
 
         layout3.getChildren().addAll(over);
         layout.getChildren().addAll(menu, quit);
