@@ -215,9 +215,11 @@ public class GameTimer extends AnimationTimer {
 
     private void initUI(Pane uiRoot) {
         uiRoot.setPrefSize(1920, 1080);
-        Button pause = new Button("pause");
-        pause.setLayoutX(1800);
+        ImageView pauseImg = new ImageView("images/UI Elements/pause_button.png");
+        Button pause = new Button("", pauseImg);
+        pause.setLayoutX(1750);
         pause.setLayoutY(50);
+        pause.setStyle("-fx-background-color: transparent;");
 
         healthPoints = new Label();
         time = new Label();
@@ -267,24 +269,37 @@ public class GameTimer extends AnimationTimer {
         pauseUI.setLayoutX(710);
         pauseUI.setLayoutY(340);
 
-        VBox layout = new VBox();
+        HBox layout = new HBox();
         layout.setAlignment(Pos.CENTER);
         layout.setPrefSize(500, 400);
         layout.setSpacing(20);
+
+        VBox layout2 = new VBox();
+        layout2.setAlignment(Pos.CENTER);
+        layout2.setPrefSize(500, 400);
+        layout2.setSpacing(20);
 
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
 
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
-        Button resume = new Button("resume");
-        Button menu = new Button("main menu");
-        Button quit = new Button("quit");
-        resume.setMinSize(100, 50);
-        resume.setMaxSize(100, 50);
-        menu.setMinSize(100, 50);
-        menu.setMaxSize(100, 50);
-        quit.setMinSize(100, 50);
-        quit.setMaxSize(100, 50);
+
+        ImageView resumeImg = new ImageView("images/UI Elements/next_button.png");
+        ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
+        ImageView quitImg = new ImageView("images/UI Elements/quit.png");
+
+        Button resume = new Button("", resumeImg);
+        Button menu = new Button("", menuImg);
+        Button quit = new Button("", quitImg);
+
+        resume.setStyle("-fx-background-color: transparent;");
+        menu.setStyle("-fx-background-color: transparent;");
+        quit.setStyle("-fx-background-color: transparent;");
+
+        new SetUpButton(resume);
+        new SetUpButton(menu);
+        new SetUpButton(quit);
+
         resume.setOnMouseClicked(event -> resumeGame(uiRoot));
         menu.setOnMouseClicked(event -> backToMenu());
         quit.setOnMouseClicked(event -> {
@@ -292,8 +307,15 @@ public class GameTimer extends AnimationTimer {
             System.exit(0);
         });
 
+        Label paused = new Label();
+        paused.setText("Paused!");
+        paused.setFont(new Font("ArcadeClassic", 64));
+//        over.setStyle("-fx-text-fill: white;");
+        paused.setTranslateY(50);
+
         layout.getChildren().addAll(resume, menu, quit);
-        pauseUI.getChildren().addAll(bg, layout);
+        layout2.getChildren().addAll(paused, layout);
+        pauseUI.getChildren().addAll(bg, layout2);
 
     }
 
@@ -336,18 +358,21 @@ public class GameTimer extends AnimationTimer {
         matte.setOpacity(0.5);
 
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
-        Button next_level = new Button("next level");
-        Button menu = new Button("main menu");
-        Button quit = new Button("quit");
+        ImageView nextImg = new ImageView("images/UI Elements/next_button.png");
+        ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
+        ImageView quitImg = new ImageView("images/UI Elements/quit.png");
 
-        next_level.setMinSize(100, 50);
-        next_level.setMaxSize(100, 50);
+        Button next_level = new Button("", nextImg);
+        Button menu = new Button("", menuImg);
+        Button quit = new Button("", quitImg);
 
-        menu.setMinSize(100, 50);
-        menu.setMaxSize(100, 50);
+        next_level.setStyle("-fx-background-color: transparent;");
+        menu.setStyle("-fx-background-color: transparent;");
+        quit.setStyle("-fx-background-color: transparent;");
 
-        quit.setMinSize(100, 50);
-        quit.setMaxSize(100, 50);
+        new SetUpButton(next_level);
+        new SetUpButton(menu);
+        new SetUpButton(quit);
 
         next_level.setOnAction(event -> nextLevel());
         menu.setOnAction(event -> backToMenu());
@@ -396,12 +421,18 @@ public class GameTimer extends AnimationTimer {
         matte.setOpacity(0.5);
 
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
-        Button menu = new Button("main menu");
-        Button quit = new Button("quit");
-        menu.setMinSize(100, 50);
-        menu.setMaxSize(100, 50);
-        quit.setMinSize(100, 50);
-        quit.setMaxSize(100, 50);
+        ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
+        ImageView quitImg = new ImageView("images/UI Elements/quit.png");
+
+        Button menu = new Button("", menuImg);
+        Button quit = new Button("", quitImg);
+
+        menu.setStyle("-fx-background-color: transparent;");
+        quit.setStyle("-fx-background-color: transparent;");
+
+        new SetUpButton(menu);
+        new SetUpButton(quit);
+
         menu.setOnAction(event -> backToMenu());
         quit.setOnAction(event -> {
             Platform.exit();
