@@ -16,6 +16,8 @@ public class SetUpButton {
 
         button.setEffect(colorAdjust);
 
+        // on mouse enter brightness down
+        // on mouse exit brightness normal
         button.setOnMouseEntered(e -> {
             Timeline fadeInTimeline = new Timeline(
                     new KeyFrame(Duration.seconds(0),

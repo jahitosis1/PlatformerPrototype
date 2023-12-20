@@ -36,7 +36,7 @@ public class GameStage {
     stage.setMinWidth(WINDOW_WIDTH);
     stage.setMinHeight(WINDOW_HEIGHT);
 
-    stage.setFullScreen(true);
+    stage.setFullScreen(false);
     stage.setResizable(false);
 
     this.gameTimer.start();

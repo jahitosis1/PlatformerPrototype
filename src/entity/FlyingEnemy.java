@@ -61,6 +61,7 @@ public class FlyingEnemy extends Enemy {
     }
 
     public void returnToPos() {
+        // calculates direction player using trigonometry and moves towards the player
         double diffX = orig_x - this.getTranslateX();
         double diffY = orig_y - this.getTranslateY();
 

@@ -76,6 +76,8 @@ public class GameTimer extends AnimationTimer {
     private final MediaPlayer on_jump = new MediaPlayer(jumpSFX);
     private final Media coinSFX = new Media(new File("images/coin_collect.wav").toURI().toString());
     private final MediaPlayer on_collect = new MediaPlayer(coinSFX);
+    protected final Media bgSFX = new Media(new File("images/ingameSFX.mp3").toURI().toString());
+    protected final MediaPlayer on_start = new MediaPlayer(bgSFX);
 
     Rectangle matte;
 
@@ -93,6 +95,7 @@ public class GameTimer extends AnimationTimer {
         initGameOverUI();
         isPaused = false;
 
+        // special case W for "onKeyDown" implementation
         gameScene.setOnKeyPressed(event -> {
             if (event.getCode() != KeyCode.W) {
                 keys.put(event.getCode(), true);
@@ -120,24 +123,28 @@ public class GameTimer extends AnimationTimer {
 
     private void update() {
         if (!isPaused) {
+            // moves player
             if (playerVelocity.getY() < 10) playerVelocity = playerVelocity.add(0, 0.3);
             if (isPressed(KeyCode.A) && player.getTranslateX() >= 5) movePlayerX(-3);
             if (isPressed(KeyCode.D) && player.getTranslateX() + 40 <= levelWidth - 5) movePlayerX(3);
             movePlayerY((int) playerVelocity.getY());
             if (!isPressed(KeyCode.W) && !isPressed(KeyCode.A) && !isPressed(KeyCode.S) && !isPressed(KeyCode.D))
                 player.stopMoveAnimation();
+            // moves enemy and checks for collision every update
             moveEnemy();
             collideCoin();
             collideNPC();
             collideEnemy();
             collideTrap();
             updateUI();
+            // end conditions: 0 hp or stage clear
             if (player.player_hp <= 0) gameOver(uiRoot);
             if (isCleared()) stageClear(uiRoot);
         }
     }
 
     public void clearAll() {
+        // resets all values
         platforms.clear();
         walls.clear();
         traps.clear();
@@ -150,7 +157,9 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void initContent(Pane gameRoot, String[] levelData) {
+        // initializes game content
         clearAll();
+        on_start.play();
         gameRoot.setPrefSize(1920 * 20, 1080*2);
         Image bg = new Image("images/City3.png", 0, 1080 * 2, false, true);
 
@@ -170,6 +179,7 @@ public class GameTimer extends AnimationTimer {
         player = createPlayer(130, levelHeight - 550, gameRoot);
         player.player_hp = 10;
 
+        // checks the "map" file, and creates the map accordingly
         for (int i = 0; i < levelData.length; i++) {
             String line = levelData[i];
             for (int j = 0; j < line.length(); j++) {
@@ -218,6 +228,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void initUI(Pane uiRoot) {
+        // initializes UI: coin, hp and time indicator + pause button
         uiRoot.setPrefSize(1920, 1080);
         ImageView pauseImg = new ImageView("images/UI Elements/pause_button.png");
         Button pause = new Button("", pauseImg);
@@ -269,6 +280,7 @@ public class GameTimer extends AnimationTimer {
 
     private void initPauseUI(Pane uiRoot) {
 
+        // initialize elements for the interface shown when game is paused
         pauseUI = new Pane();
         pauseUI.setPrefSize(500, 400);
         pauseUI.setLayoutX(710);
@@ -287,7 +299,10 @@ public class GameTimer extends AnimationTimer {
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
 
+        Image pauseBG = new Image("images/UI Elements/clear.png");
+        ImagePattern pattern = new ImagePattern(pauseBG);
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        bg.setFill(pattern);
 
         ImageView resumeImg = new ImageView("images/UI Elements/next_button.png");
         ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
@@ -315,7 +330,7 @@ public class GameTimer extends AnimationTimer {
         Label paused = new Label();
         paused.setText("Paused!");
         paused.setFont(new Font("ArcadeClassic", 64));
-//        over.setStyle("-fx-text-fill: white;");
+        paused.setStyle("-fx-text-fill: white;");
         paused.setTranslateY(50);
 
         layout.getChildren().addAll(resume, menu, quit);
@@ -326,6 +341,7 @@ public class GameTimer extends AnimationTimer {
 
     private void initClearUI() {
 
+        // initialize elements for the interface shown when game is cleared
         stageClearUI = new Pane();
         stageClearUI.setPrefSize(500, 400);
         stageClearUI.setLayoutX(710);
@@ -355,14 +371,18 @@ public class GameTimer extends AnimationTimer {
         coins_collected = new Label();
 
         score.setFont(new Font("ArcadeClassic", 34));
-//        score.setStyle("-fx-text-fill: white;");
+        score.setStyle("-fx-text-fill: white;");
         coins_collected.setFont(new Font("ArcadeClassic", 34));
-//        coins_collected.setStyle("-fx-text-fill: white;");
+        coins_collected.setStyle("-fx-text-fill: white;");
 
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
 
+        Image pauseBG = new Image("images/UI Elements/clear.png");
+        ImagePattern pattern = new ImagePattern(pauseBG);
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        bg.setFill(pattern);
+
         ImageView nextImg = new ImageView("images/UI Elements/next_button.png");
         ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
         ImageView quitImg = new ImageView("images/UI Elements/quit.png");
@@ -379,8 +399,14 @@ public class GameTimer extends AnimationTimer {
         new SetUpButton(menu);
         new SetUpButton(quit);
 
-        next_level.setOnAction(event -> nextLevel());
-        menu.setOnAction(event -> backToMenu());
+        next_level.setOnAction(event -> {
+            on_start.stop();
+            nextLevel();
+        });
+        menu.setOnAction(event -> {
+            on_start.stop();
+            backToMenu();
+        });
         quit.setOnAction(event -> {
             Platform.exit();
             System.exit(0);
@@ -389,7 +415,7 @@ public class GameTimer extends AnimationTimer {
         Label cleared = new Label();
         cleared.setText("Stage CLear!");
         cleared.setFont(new Font("ArcadeClassic", 64));
-//        cleared.setStyle("-fx-text-fill: white;");
+        cleared.setStyle("-fx-text-fill: white;");
         cleared.setTranslateY(50);
 
         layout4.getChildren().addAll(score, coins_collected);
@@ -402,6 +428,7 @@ public class GameTimer extends AnimationTimer {
 
     private void initGameOverUI() {
 
+        // initialize elements for the interface shown when player dies or the game is lost
         gameOverUI = new Pane();
         gameOverUI.setPrefSize(500, 400);
         gameOverUI.setLayoutX(710);
@@ -425,7 +452,11 @@ public class GameTimer extends AnimationTimer {
         matte = new Rectangle(1920, 1080, Color.BLACK);
         matte.setOpacity(0.5);
 
+        Image pauseBG = new Image("images/UI Elements/game over.png");
+        ImagePattern pattern = new ImagePattern(pauseBG);
         Rectangle bg = new Rectangle(500, 400, Color.LIGHTBLUE);
+        bg.setFill(pattern);
+
         ImageView menuImg = new ImageView("images/UI Elements/back_button.png");
         ImageView quitImg = new ImageView("images/UI Elements/quit.png");
 
@@ -438,7 +469,10 @@ public class GameTimer extends AnimationTimer {
         new SetUpButton(menu);
         new SetUpButton(quit);
 
-        menu.setOnAction(event -> backToMenu());
+        menu.setOnAction(event -> {
+            on_start.stop();
+            backToMenu();
+        });
         quit.setOnAction(event -> {
             Platform.exit();
             System.exit(0);
@@ -447,7 +481,7 @@ public class GameTimer extends AnimationTimer {
         Label over = new Label();
         over.setText("You Died!");
         over.setFont(new Font("ArcadeClassic", 64));
-//        over.setStyle("-fx-text-fill: white;");
+        over.setStyle("-fx-text-fill: white;");
 
         layout3.getChildren().addAll(over);
         layout.getChildren().addAll(menu, quit);
@@ -456,6 +490,7 @@ public class GameTimer extends AnimationTimer {
 
     }
     private void initViewport(){
+        // sets viewport to follow player
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
             if (offset > GameStage.WINDOW_WIDTH / 2 && offset < levelWidth - GameStage.WINDOW_WIDTH / 2) {
@@ -473,30 +508,37 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void updateUI() {
+        // updates the UI labels to their respective values
         healthPoints.setText("  " + player.player_hp);
         coin_count.setText("  " + player_coins);
         time.setText("Time: " + gameTimer);
     }
 
     private void pauseGame(Pane uiRoot) {
+        // pause the game and show pause UI
         uiRoot.getChildren().addAll(matte, pauseUI);
         isPaused = true;
     }
 
     private void resumeGame(Pane uiRoot) {
+        // resume the game and hide pause UI
         uiRoot.getChildren().removeAll(pauseUI, matte);
         isPaused = false;
     }
 
     private void gameOver(Pane uiRoot) {
+        // show game over UI
         uiRoot.getChildren().addAll(matte, gameOverUI);
         isPaused = true;
     }
 
     private void stageClear(Pane uiRoot) {
+        // changes boolean value in the levels hashmap when game is cleared depending on the level
         if (levelData == LevelData.LEVEL1) StageMenu.levels.put("level2", true);
         if (levelData == LevelData.LEVEL2) StageMenu.levels.put("level3", true);
         uiRoot.getChildren().addAll(matte, stageClearUI);
+        // calculates the score and sets it as text for score label in stage clear UI
+        // also the coins
         score_int = ((100/(int) gameTimer) + player_coins - (10 - player.player_hp) + enemies_killed) * 100;
         score.setText("score: " + score_int);
         coins_collected.setText("Coins: " + player_coins);
@@ -511,6 +553,7 @@ public class GameTimer extends AnimationTimer {
 
             @Override
             public void run() {
+                // when game is paused, in-game timer will not be updated
                 if (!isPaused) {
                     count++;
                     gameTimer = (double) count / 100;
@@ -520,6 +563,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void rotatePlayer() {
+        // was made as a random thing to test javafx capabilities
         RotateTransition rotate = new RotateTransition();
         rotate.setNode(player);
         rotate.setByAngle(360);
@@ -530,6 +574,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void movePlayerX(int value) {
+        // moves player X, and checks when there are collisions and the player cannot move anymore on the x-axis
         boolean movingRight = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
@@ -543,6 +588,7 @@ public class GameTimer extends AnimationTimer {
                 }
             }
             for (Node wall : walls) {
+                // when colliding with a wall, slows fall speed and allows the user to jump once more
                 if (player.getTranslateX() + 80 >= wall.getTranslateX()) {
                     player.setTranslateX(player.getTranslateX() - 1);
                     if (!doneOnce){
@@ -562,6 +608,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void movePlayerY(int value) {
+        // moves player X, and checks when there are collisions and the player cannot move anymore on the x-axis
         boolean movingDown = value > 0;
         if (invertedGravity) movingDown = !movingDown;
 
@@ -579,6 +626,7 @@ public class GameTimer extends AnimationTimer {
                             return;
                         }
                     } else {
+                        // if player collides with a platform above, stops y movement
                         if (player.getTranslateY() <= platform.getTranslateY() + 120) return;
                     }
                 }
@@ -588,6 +636,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void jumpPlayer() {
+        // adds Y velocity, which is used for the move y in update function above
         if (canJump > 0) {
             on_jump.stop();
             on_jump.seek(Duration.ZERO);
@@ -599,6 +648,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     public void moveEnemy() {
+        // same as player's, even if enemy has not yet reached max x movement, if it hits a platform, stops
         for (Enemy enemy : enemies) {
             enemy.move();
 
@@ -616,6 +666,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void collideCoin() {
+        // coin collision event
         if (coins.isEmpty()) return;
         for (Node coin : coins) {
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
@@ -629,9 +680,11 @@ public class GameTimer extends AnimationTimer {
         }
     }
     private void collideNPC() {
+        // npc collision event
         if (npcs.isEmpty()) return;
         for (Node npc : npcs) {
             if (player.getBoundsInParent().intersects(npc.getBoundsInParent())) {
+                // increase jump power for 3 seconds
                 jumpPower = 35;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
@@ -655,28 +708,23 @@ public class GameTimer extends AnimationTimer {
     private void collideEnemy() {
         for (Enemy enemy : enemies) {
             if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
+                // damages player on enemy hit
                 if (enemy instanceof FlyingEnemy) {
                     player.damagePlayer(5);
                     if (!killBuff) continue;
+                    // if flying enemy, not killable
                 }
+                // if player hit basic enemy from below or from side, takes damage, otherwise kill enemy, no damage to player
                 if (player.getTranslateY() + 80 > enemy.getTranslateY() + 10) player.damagePlayer(3);
                 enemy.die();
                 enemies.remove(enemy);
                 gameRoot.getChildren().remove(enemy);
             }
-            double distance = Math.sqrt(Math.pow(player.getTranslateX() - enemy.getTranslateX(), 2) + Math.pow(player.getTranslateY() - enemy.getTranslateY(), 2));
-
-            if (distance <= 100) {
-                if (player.getTranslateX() > enemy.getTranslateX()) {
-                    player.setTranslateX(player.getTranslateX() + 1);
-                } else {
-                    player.setTranslateX(player.getTranslateX() - 1);
-                }
-            }
 
         }
     }
     private void collideTrap(){
+        // changed bound checker for traps since spike is only half tile high
         for (Node trap : traps) {
             Bounds trapBounds = trap.getBoundsInParent();
             double trapHalfHeight = trapBounds.getHeight() / 2;
@@ -695,6 +743,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private Node createMap(int x, int y, ImagePattern fill, Pane gameRoot) {
+        // creates the map
         Rectangle entity = new Rectangle(120, 120);
         entity.setTranslateX(x);
         entity.setTranslateY(y);
@@ -705,6 +754,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private Player createPlayer(int x, int y, Pane gameRoot) {
+        // creates player
         Player entity = new Player(x, y);
 
         gameRoot.getChildren().add(entity);
@@ -712,6 +762,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private NPC createNPC(int x, int y, Pane gameRoot) {
+        // creates npc
         NPC entity = new NPC(x, y);
 
         gameRoot.getChildren().add(entity);
@@ -719,6 +770,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private Coin createCoin(int x, int y, Pane gameRoot) {
+        // spawns coin
         Coin entity = new Coin(x, y);
 
         gameRoot.getChildren().add(entity);
@@ -726,6 +778,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private BasicEnemy createBasicEnemy(int x, int y, Pane gameRoot) {
+        // spawns walking enemy
         BasicEnemy entity = new BasicEnemy(x, y);
 
         gameRoot.getChildren().add(entity);
@@ -733,6 +786,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private FlyingEnemy createEliteEnemy(int x, int y, Pane gameRoot) {
+        // spawns flyfly
         FlyingEnemy entity = new FlyingEnemy(x, y, player);
 
         gameRoot.getChildren().add(entity);
@@ -740,22 +794,25 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void backToMenu() {
+        // stops gameTimer and "returns" to menu
         this.stop();
         new StageMenu(primaryStage);
     }
 
     private boolean isCleared() {
+        // clear conditions checker
+        // for the sake of presentation, these were what we used
         if (levelData == LevelData.LEVEL1) {
-            return gameTimer >= 10;
+            return gameTimer >= 20;
         }
         if (levelData == LevelData.LEVEL2) {
             return coins.isEmpty() && enemies.isEmpty();
         }
         if (levelData == LevelData.LEVEL3) {
-            return gameTimer >= 10;
+            return gameTimer >= 20;
         }
         if (levelData == LevelData.BONUS_LEVEL) {
-            return gameTimer >= 10;
+            return gameTimer >= 20;
         }
         return false;
     }
@@ -778,7 +835,7 @@ public class GameTimer extends AnimationTimer {
         if (levelData == LevelData.BONUS_LEVEL) {
             this.stop();
             primaryStage.setScene(mainMenu);
-            primaryStage.setFullScreen(true);
+            primaryStage.setFullScreen(false);
             primaryStage.setResizable(false);
         }
     }
@@ -806,5 +863,6 @@ public class GameTimer extends AnimationTimer {
     private boolean isPressed(KeyCode key) {
         return keys.getOrDefault(key, false);
     }
+    // returns boolean value of key from the hashmap
 
 }

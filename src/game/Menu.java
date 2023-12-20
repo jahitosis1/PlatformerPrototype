@@ -41,7 +41,7 @@ public abstract class Menu {
         initContent(layout);
 
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
