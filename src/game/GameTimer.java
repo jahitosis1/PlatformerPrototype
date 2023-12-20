@@ -3,6 +3,7 @@ package game;
 import entity.*;
 import javafx.animation.AnimationTimer;
 import javafx.animation.Interpolator;
+import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
@@ -17,6 +18,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -24,6 +28,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -39,6 +44,10 @@ public class GameTimer extends AnimationTimer {
     private final ArrayList<Node> coins = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
     private final String[] levelData;
+    private final Scene mainMenu;
+    private final Stage primaryStage;
+    private final Pane gameRoot;
+    private final Pane uiRoot;
     private int player_coins;
     private int enemies_killed;
     private int score_int;
@@ -59,15 +68,10 @@ public class GameTimer extends AnimationTimer {
     private Pane gameOverUI;
     private Pane stageClearUI;
     private boolean isPaused = false;
-    private boolean invulnerable = false;
     private boolean doneOnce = false;
     private boolean pressedOnce = false;
     private boolean killBuff = false;
     private boolean invertedGravity = false;
-    private final Scene mainMenu;
-    private final Stage primaryStage;
-    private final Pane gameRoot;
-    private final Pane uiRoot;
 
     Rectangle matte;
 
@@ -87,7 +91,7 @@ public class GameTimer extends AnimationTimer {
 
         gameScene.setOnKeyPressed(event -> {
             if (event.getCode() != KeyCode.W) {
-                    keys.put(event.getCode(), true);
+                keys.put(event.getCode(), true);
             }else{
                 if (!pressedOnce) {
                     jumpPlayer();
@@ -403,7 +407,6 @@ public class GameTimer extends AnimationTimer {
 
     }
     private void initViewport(){
-        System.out.println(player.getTranslateY());
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
             if (offset > GameStage.WINDOW_WIDTH / 2 && offset < levelWidth - GameStage.WINDOW_WIDTH / 2) {
@@ -545,7 +548,7 @@ public class GameTimer extends AnimationTimer {
 
     public void moveEnemy() {
         for (Enemy enemy : enemies) {
-                enemy.move();
+            enemy.move();
 
             for (Node platform : platforms) {
                 if (enemy.getBoundsInParent().intersects(platform.getBoundsInParent())) {
@@ -681,6 +684,7 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void backToMenu() {
+        if (levelData == LevelData.LEVEL3)  rickRoll();
         this.stop();
         new StageMenu(primaryStage);
     }
@@ -703,20 +707,45 @@ public class GameTimer extends AnimationTimer {
 
     private void nextLevel() {
         // go to next level after clear
-        this.stop();
+        if (levelData == LevelData.LEVEL3) {
+            rickRoll();
+        }
         if (levelData == LevelData.LEVEL1) {
+            this.stop();
             GameStage theStage = new GameStage(primaryStage, mainMenu, LevelData.LEVEL2);
             theStage.setStage();
         }
         if (levelData == LevelData.LEVEL2) {
+            this.stop();
             GameStage theStage = new GameStage(primaryStage, mainMenu, LevelData.LEVEL3);
             theStage.setStage();
         }
-        if (levelData == LevelData.BONUS_LEVEL || levelData == LevelData.LEVEL3) {
+        if (levelData == LevelData.BONUS_LEVEL) {
+            this.stop();
             primaryStage.setScene(mainMenu);
             primaryStage.setFullScreen(true);
             primaryStage.setResizable(false);
         }
+    }
+    private void rickRoll(){
+        System.out.println("rickRoll");
+        Media rickRollVid = new Media(new File("images/RickRoll.mp4").toURI().toString());
+        MediaPlayer rickRoll = new MediaPlayer(rickRollVid);
+        MediaView mediaView = new MediaView(rickRoll);
+        mediaView.setFitWidth(1920);
+        mediaView.setFitHeight(1080);
+
+        uiRoot.getChildren().add(mediaView);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        pause.setOnFinished(event -> {
+            rickRoll.stop();
+            uiRoot.getChildren().remove(mediaView);
+            this.stop();
+        });
+        pause.play();
+
+        rickRoll.play();
     }
 
     private boolean isPressed(KeyCode key) {
