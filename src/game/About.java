@@ -49,6 +49,7 @@ public class About extends Menu {
         resume.setStyle("-fx-background-color: transparent;");
         resume.setTranslateX(850);
         resume.setTranslateY(-450);
+        new SetUpButton(resume);
 
         resume.setOnAction(e -> {
             playMusic.stop();

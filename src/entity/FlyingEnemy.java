@@ -71,6 +71,9 @@ public class FlyingEnemy extends Enemy {
         this.setTranslateX(this.getTranslateX() + speed * Math.cos(angle));
         this.setTranslateY(this.getTranslateY() + speed * Math.sin(angle));
 
+        if (Math.cos(angle) > 0) this.setScaleX(1);
+        if (Math.cos(angle) < 0) this.setScaleX(-1);
+
         stopDiveAnimation();
     }
 

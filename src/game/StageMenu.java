@@ -53,6 +53,11 @@ public class StageMenu extends Menu {
         button4.setStyle("-fx-background-color: transparent;");
         back.setStyle("-fx-background-color: transparent;");
 
+        new SetUpButton(button);
+        new SetUpButton(button2);
+        new SetUpButton(button3);
+        new SetUpButton(back);
+
         back.setTranslateX(850);
         back.setTranslateY(-450);
 

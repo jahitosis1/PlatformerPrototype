@@ -345,6 +345,7 @@ public class GameTimer extends AnimationTimer {
 
         Label cleared = new Label();
         cleared.setText("Stage CLear!");
+        cleared.setTranslateY(50);
 
         layout4.getChildren().addAll(score, coins_collected);
         layout3.getChildren().addAll(cleared, layout4);

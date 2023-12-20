@@ -25,6 +25,7 @@ public class Credits extends Menu {
         });
         resume.setTranslateX(850);
         resume.setTranslateY(-450);
+        new SetUpButton(resume);
 
         ImageView creditText = new ImageView("images/UI Elements/credits.png");
         creditText.setTranslateY(-350);
