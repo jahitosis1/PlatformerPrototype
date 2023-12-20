@@ -684,7 +684,6 @@ public class GameTimer extends AnimationTimer {
     }
 
     private void backToMenu() {
-        if (levelData == LevelData.LEVEL3)  rickRoll();
         this.stop();
         new StageMenu(primaryStage);
     }
