@@ -2,13 +2,19 @@ package entity;
 
 import javafx.animation.*;
 import javafx.scene.image.Image;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+
+import java.io.File;
 
 public class Player extends Sprite {
     private final static int PLAYER_SIZE = 80;
     private final static Image PLAYER_SPRITE_IDLE = new Image("images/Character1M_1_idle_1.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     private final static Image PLAYER_SPRITE_MOVE7 = new Image("images/Character1M_1_run_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
     private final static Image PLAYER_SPRITE_JUMP = new Image("images/Character1M_1_jump_0.png", PLAYER_SIZE, PLAYER_SIZE, false, false);
+    private final Media damageSFX = new Media(new File("images/on_damage.wav").toURI().toString());
+    private final MediaPlayer on_damage = new MediaPlayer(damageSFX);
     public boolean isJumping = true;
     public boolean invulnerable = false;
     public int player_hp = 10;
@@ -85,6 +91,9 @@ public class Player extends Sprite {
 
     public void damagePlayer(int value) {
         if (!invulnerable) {
+            on_damage.stop();
+            on_damage.seek(Duration.ZERO);
+            on_damage.play();
             player_hp -= value;
             invulnerabilityTimer();
         }

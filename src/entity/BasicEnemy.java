@@ -37,9 +37,4 @@ public class BasicEnemy extends Enemy {
         idleAnimation.stop();
         moveAnimation.play();
     }
-    public void die() {
-        isAlive = false;
-        moveAnimation.stop();
-        deathAnimation.play();
-    }
 }

@@ -72,6 +72,10 @@ public class GameTimer extends AnimationTimer {
     private boolean pressedOnce = false;
     private boolean killBuff = false;
     private boolean invertedGravity = false;
+    private final Media jumpSFX = new Media(new File("images/jump.wav").toURI().toString());
+    private final MediaPlayer on_jump = new MediaPlayer(jumpSFX);
+    private final Media coinSFX = new Media(new File("images/coin_collect.wav").toURI().toString());
+    private final MediaPlayer on_collect = new MediaPlayer(coinSFX);
 
     Rectangle matte;
 
@@ -220,6 +224,7 @@ public class GameTimer extends AnimationTimer {
         pause.setLayoutX(1750);
         pause.setLayoutY(50);
         pause.setStyle("-fx-background-color: transparent;");
+        new SetUpButton(pause);
 
         healthPoints = new Label();
         time = new Label();
@@ -584,6 +589,9 @@ public class GameTimer extends AnimationTimer {
 
     private void jumpPlayer() {
         if (canJump > 0) {
+            on_jump.stop();
+            on_jump.seek(Duration.ZERO);
+            on_jump.play();
             playerVelocity = playerVelocity.add(0, -jumpPower);
             canJump--;
             player.startJumpAnimation();
@@ -612,6 +620,9 @@ public class GameTimer extends AnimationTimer {
         for (Node coin : coins) {
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
                 player_coins++;
+                on_collect.stop();
+                on_collect.seek(Duration.ZERO);
+                on_collect.play();
                 coins.remove(coin);
                 gameRoot.getChildren().remove(coin);
             }
@@ -649,6 +660,7 @@ public class GameTimer extends AnimationTimer {
                     if (!killBuff) continue;
                 }
                 if (player.getTranslateY() + 80 > enemy.getTranslateY() + 10) player.damagePlayer(3);
+                enemy.die();
                 enemies.remove(enemy);
                 gameRoot.getChildren().remove(enemy);
             }
